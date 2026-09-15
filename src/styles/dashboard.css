@@ -1,0 +1,188 @@
+/* =================================
+   ADMIN DASHBOARD
+   ================================= */
+
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  background: var(--background);
+}
+
+
+/* =================================
+   CONTENT
+   ================================= */
+
+.admin-content {
+  flex: 1;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+
+/* =================================
+   HEADER
+   ================================= */
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.admin-header h2 {
+  margin: 0 0 5px;
+  color: var(--text-primary);
+  font-size: 24px;
+}
+
+.admin-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+
+/* =================================
+   PROFILE
+   ================================= */
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+
+  background: var(--primary);
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 700;
+}
+
+.admin-profile strong,
+.admin-profile span {
+  display: block;
+}
+
+.admin-profile strong {
+  color: var(--text-primary);
+}
+
+.admin-profile span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+
+/* =================================
+   DASHBOARD CARDS
+   ================================= */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.dashboard-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+  min-height: 190px;
+}
+
+.dashboard-card-title {
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.4;
+  min-height: 45px;
+}
+
+.dashboard-number {
+  margin-top: 15px;
+  color: var(--primary);
+  font-size: 36px;
+  font-weight: 700;
+}
+
+
+/* =================================
+   PETA LAHAN ADMIN
+   ================================= */
+
+.map-placeholder {
+  width: 100%;
+  margin-top: 30px;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.map-placeholder h3 {
+  margin: 0;
+  padding: 25px 30px;
+
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.map-lahan {
+  width: 100%;
+  overflow: hidden;
+}
+
+.map-lahan .leaflet-container {
+  width: 100%;
+  height: 500px;
+  z-index: 1;
+}
+
+.map-lahan .leaflet-popup-content {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.map-lahan .leaflet-popup-content strong {
+  color: var(--primary);
+}
+
+
+/* =================================
+   RESPONSIVE DASHBOARD
+   ================================= */
+
+@media (max-width: 1000px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-content {
+    padding: 20px;
+  }
+}

@@ -1,0 +1,31 @@
+:root {
+  /* PRIMARY */
+  --primary: #0F6D3A;
+  --primary-dark: #0B4F2A;
+  --primary-light: #EAF6EF;
+
+  /* ACCENT */
+  --accent: #F4C430;
+  --accent-light: #FFF8E1;
+
+  /* BACKGROUND */
+  --background: #F9FAFB;
+  --surface: #FFFFFF;
+
+  /* TEXT */
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-hint: #9CA3AF;
+
+  /* BORDER */
+  --border: #E5E7EB;
+
+  /* STATUS */
+  --success: #16A34A;
+  --warning: #F59E0B;
+  --error: #DC2626;
+  --error-background: #FEF2F2;
+
+  /* BASIC */
+  --white: #FFFFFF;
+}
