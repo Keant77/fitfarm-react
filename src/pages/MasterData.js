@@ -12,7 +12,7 @@ function MasterData({
       <div className="master-header">
         <div>
           <h1>MASTER DATA</h1>
-          <p>Pengelolaan data sistem FitFarm</p>
+          <p>Pengelolaan data sistem MaizeFit</p>
         </div>
 
         <button
@@ -31,7 +31,7 @@ function MasterData({
           <h2>Data User</h2>
 
           <p>
-            Data pengguna yang terdaftar pada sistem FitFarm.
+            Data pengguna yang terdaftar pada sistem MaizeFit.
           </p>
 
           <div className="master-number">
@@ -91,7 +91,7 @@ function MasterData({
           <h2>Data Lahan</h2>
 
           <p>
-            Data lahan yang dinilai dalam sistem FitFarm.
+            Data lahan yang dinilai dalam sistem MaizeFit.
           </p>
 
           <div className="master-number">

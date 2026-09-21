@@ -130,7 +130,7 @@ function Aturan({ onBack }) {
           <div>
             <h2>Data Aturan</h2>
             <p>
-              Daftar aturan penilaian kelayakan lahan FitFarm.
+              Daftar aturan penilaian kelayakan lahan MaizeFit.
             </p>
           </div>
 

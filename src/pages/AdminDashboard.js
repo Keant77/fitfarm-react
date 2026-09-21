@@ -24,7 +24,7 @@ function AdminDashboard({ onLogout }) {
 
         {/* LOGO */}
         <div className="sidebar-logo">
-          FITFARM
+          MaizeFit
         </div>
 
         {/* MENU */}
@@ -133,7 +133,7 @@ function AdminDashboard({ onLogout }) {
               <div>
                 <h2>DASHBOARD ADMIN</h2>
                 <p>
-                  Selamat datang di sistem FitFarm
+                  Selamat datang di sistem MaizeFit
                 </p>
               </div>
 
@@ -179,12 +179,11 @@ function AdminDashboard({ onLogout }) {
             </section>
 
             <div className="map-placeholder">
-              <h3>Peta Lahan FitFarm</h3>
+              <h3>Peta Lahan MaizeFit</h3>
               <MapLahan />
             </div>
           </>
         )}
-
         {/* MASTER DATA - DEFAULT */}
         {activePage === "master" && (
           <MasterData />

@@ -252,7 +252,7 @@ function Lahan() {
           <h1>DATA LAHAN</h1>
 
           <p>
-            Data lahan pertanian sistem FitFarm
+            Data lahan pertanian sistem MaizeFit
           </p>
         </div>
       </div>

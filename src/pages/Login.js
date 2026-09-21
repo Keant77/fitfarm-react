@@ -24,7 +24,7 @@ function Login({ onLogin }) {
       <div className="auth-card">
 
         <div className="auth-header">
-          <h1>FITFARM</h1>
+          <h1>MaizeFit</h1>
           <p>Login Admin</p>
         </div>
 

@@ -4,7 +4,7 @@ function Register({ onRegister, onLogin }) {
       <div className="auth-card register-card">
 
         <div className="auth-header">
-          <h1>FITFARM</h1>
+          <h1>MaizeFit</h1>
           <p>Buat akun baru</p>
         </div>
 

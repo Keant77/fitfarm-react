@@ -110,7 +110,7 @@ function RiwayatPenilaian() {
           <h1>RIWAYAT PENILAIAN</h1>
 
           <p>
-            Riwayat hasil penilaian kelayakan lahan FitFarm
+            Riwayat hasil penilaian kelayakan lahan MaizeFit
           </p>
         </div>
       </div>

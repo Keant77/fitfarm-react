@@ -155,7 +155,7 @@ function Role() {
           <h1>DATA ROLE</h1>
 
           <p>
-            Data role pengguna sistem FitFarm
+            Data role pengguna sistem MaizeFit
           </p>
         </div>
       </div>

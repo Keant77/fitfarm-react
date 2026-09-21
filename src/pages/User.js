@@ -173,7 +173,7 @@ function User() {
         <div>
           <h1>DATA PENGGUNA</h1>
           <p>
-            Data pengguna sistem FitFarm
+            Data pengguna sistem MaizeFit
           </p>
         </div>
       </div>

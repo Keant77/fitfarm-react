@@ -31,7 +31,7 @@ function Indikator({ onBack }) {
           <h1>DATA INDIKATOR</h1>
 
           <p>
-            Data indikator penilaian kelayakan lahan FitFarm
+            Data indikator penilaian kelayakan lahan MaizeFit
           </p>
         </div>
 
