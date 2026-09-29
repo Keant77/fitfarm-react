@@ -1,62 +1,337 @@
-/* =================================
-   LOGIN MaizeFit
-   ================================= */
+/* =====================================================
+   LOGIN PAGE
+===================================================== */
 
-.auth-container {
+.login-page {
   min-height: 100vh;
   width: 100%;
-  background: var(--background);
 
   display: flex;
+  align-items: center;
   justify-content: center;
+
+  padding: 32px;
+  box-sizing: border-box;
+
+  background: #eef8f4;
+
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   CARD UTAMA
+===================================================== */
+
+.login-card {
+  width: min(1120px, 100%);
+  min-height: 680px;
+
+  display: flex;
+
+  position: relative;
+  z-index: 2;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 20px 60px rgba(0, 70, 45, 0.14);
+}
+
+
+/* =====================================================
+   PANEL KIRI
+===================================================== */
+
+.login-info {
+  width: 48%;
+  min-height: 680px;
+
+  position: relative;
+  overflow: hidden;
+
+  padding: 48px 44px;
+  box-sizing: border-box;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 90% 5%,
+      rgba(46, 150, 106, 0.35),
+      transparent 28%
+    ),
+    linear-gradient(
+      145deg,
+      #006c47 0%,
+      #005b3d 48%,
+      #004b34 100%
+    );
+}
+
+
+/* =====================================================
+   ORNAMEN POJOK KANAN ATAS PANEL KIRI
+===================================================== */
+
+.login-top-shape {
+  position: absolute;
+
+  width: 250px;
+  height: 170px;
+
+  right: -80px;
+  top: -100px;
+
+  border-radius: 50%;
+
+  background: rgba(48, 145, 103, 0.3);
+
+  transform: rotate(12deg);
+
+  pointer-events: none;
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.login-brand,
+.login-form-logo {
+  display: flex;
   align-items: center;
 
-  padding: 20px;
-  box-sizing: border-box;
+  gap: 12px;
+
+  font-size: 27px;
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+
+  position: relative;
+  z-index: 10;
 }
 
-.auth-card {
-  width: 100%;
-  max-width: 420px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: 16px;
-
-  padding: 40px;
-
-  box-sizing: border-box;
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+.login-brand {
+  color: #ffffff;
 }
 
-.auth-header {
-  text-align: center;
-  margin-bottom: 30px;
+.login-form-logo {
+  justify-content: center;
+
+  color: #07543d;
+
+  margin-bottom: 38px;
 }
 
-.auth-header h1 {
-  margin: 0 0 8px;
+.login-logo-image {
+  width: 52px;
+  height: 52px;
 
-  color: var(--primary);
+  object-fit: contain;
 
-  font-size: 32px;
+  flex-shrink: 0;
+
+  display: block;
+}
+
+
+/* =====================================================
+   KONTEN PANEL KIRI
+===================================================== */
+
+.login-info-content {
+  position: relative;
+  z-index: 10;
+
+  margin-top: 58px;
+}
+
+.login-info-content h1 {
+  margin: 0 0 18px;
+
+  font-size: 39px;
+  line-height: 1.13;
+
+  letter-spacing: -1px;
+}
+
+.login-info-content > p {
+  max-width: 390px;
+
+  margin: 0;
+
+  font-size: 15px;
+  line-height: 1.6;
+
+  color: rgba(255, 255, 255, 0.82);
+}
+
+
+/* =====================================================
+   FEATURES
+===================================================== */
+
+.login-features {
+  margin-top: 38px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+
+  position: relative;
+  z-index: 10;
+}
+
+.login-feature {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 15px;
+
+  position: relative;
+  z-index: 11;
+}
+
+.feature-icon {
+  width: 46px;
+  height: 46px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.16);
+
+  color: #ffffff;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.login-feature div:last-child {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  padding-top: 2px;
+}
+
+.login-feature strong {
+  font-size: 14px;
   font-weight: 700;
 }
 
-.auth-header p {
-  margin: 0;
+.login-feature span {
+  font-size: 12px;
+  line-height: 1.45;
 
-  color: var(--text-secondary);
-
-  font-size: 15px;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 
-/* =================================
+/* =====================================================
+   FOOTER / ILUSTRASI BAWAH
+===================================================== */
+
+.login-bottom-decoration {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 120px;
+
+  z-index: 1;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.login-footer-image {
+  position: absolute;
+
+  left: 0;
+  bottom: -10px;
+
+  height: 120px;
+  width: 600px;
+
+  display: block;
+
+  pointer-events: none;
+}
+
+/* =====================================================
+   PANEL KANAN
+===================================================== */
+
+.login-form-panel {
+  width: 52%;
+  min-height: 680px;
+
+  padding: 50px 62px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  display: flex;
+  justify-content: center;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 430px;
+}
+
+
+/* =====================================================
+   HEADER FORM
+===================================================== */
+
+.login-form-header {
+  text-align: center;
+
+  margin-bottom: 38px;
+}
+
+.login-form-header h2 {
+  margin: 0 0 10px;
+
+  color: #064d3b;
+
+  font-size: 27px;
+  line-height: 1.25;
+}
+
+.login-form-header p {
+  margin: 0;
+
+  color: #78908a;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* =====================================================
    FORM
-   ================================= */
+===================================================== */
 
 .form-group {
   margin-bottom: 20px;
@@ -67,151 +342,293 @@
 
   margin-bottom: 8px;
 
-  color: var(--text-primary);
+  color: #164e41;
 
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.form-group input {
+.input-wrapper {
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid #b9e1d6;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.input-wrapper:focus-within {
+  border-color: #0a9b62;
+
+  box-shadow:
+    0 0 0 3px rgba(10, 155, 98, 0.08);
+}
+
+.input-icon-svg {
+  margin-left: 14px;
+
+  flex-shrink: 0;
+
+  color: #138d68;
+}
+
+.password-icon-svg {
+  margin-right: 13px;
+
+  flex-shrink: 0;
+
+  color: #8aa49e;
+}
+
+.input-wrapper input {
   width: 100%;
+  height: 100%;
 
-  padding: 12px 14px;
-
-  box-sizing: border-box;
-
-  border: 1px solid var(--border);
-  border-radius: 8px;
-
-  background: var(--surface);
-
-  color: var(--text-primary);
-
-  font-size: 14px;
-
-  outline: none;
-
-  transition: 0.2s;
-}
-
-.form-group input::placeholder {
-  color: var(--text-hint);
-}
-
-.form-group input:focus {
-  border-color: var(--primary);
-
-  box-shadow: 0 0 0 3px var(--primary-light);
-}
-
-
-/* =================================
-   LOGIN BUTTON
-   ================================= */
-
-.auth-button {
-  width: 100%;
-
-  padding: 13px;
-
-  margin-top: 5px;
+  padding: 0 12px;
 
   border: none;
-  border-radius: 8px;
+  outline: none;
 
-  background: var(--primary);
+  background: transparent;
 
-  color: var(--surface);
+  color: #21483f;
 
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 13px;
+}
+
+.input-wrapper input::placeholder {
+  color: #9bb6b0;
+}
+
+
+/* =====================================================
+   LOGIN OPTIONS
+===================================================== */
+
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 5px;
+  margin-bottom: 24px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #718b84;
+
+  font-size: 12px;
 
   cursor: pointer;
-
-  transition: 0.2s;
 }
 
-.auth-button:hover {
-  background: var(--primary-dark);
+.remember-me input {
+  display: none;
 }
 
-.auth-button:active {
-  transform: translateY(1px);
+.custom-check {
+  width: 19px;
+  height: 19px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 5px;
+
+  border: 1px solid #b5dcd0;
+
+  color: #ffffff;
+
+  background: #ffffff;
 }
 
+.remember-me input:checked + .custom-check {
+  background: #07965e;
 
-/* =================================
-   FOOTER
-   ================================= */
-
-.auth-footer {
-  margin-top: 25px;
-
-  text-align: center;
-
-  color: var(--text-secondary);
-
-  font-size: 14px;
+  border-color: #07965e;
 }
 
-.auth-footer span {
-  margin-right: 5px;
-}
-
-.link-button {
+.forgot-password {
   padding: 0;
 
   border: none;
 
   background: transparent;
 
-  color: var(--primary);
+  color: #078c5a;
 
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 
   cursor: pointer;
 }
 
-.link-button:hover {
-  color: var(--primary-dark);
-
+.forgot-password:hover {
   text-decoration: underline;
 }
 
 
-/* =================================
-   REGISTER MaizeFit
-   ================================= */
-
-.auth-card.register-card {
-  max-width: 460px;
-}
-
-.register-card .auth-header {
-  margin-bottom: 25px;
-}
-
-.register-card .form-group {
-  margin-bottom: 16px;
-}
-
-/* =================================
-   LOGIN ERROR
-   ================================= */
+/* =====================================================
+   ERROR
+===================================================== */
 
 .login-error {
-  margin-top: 10px;
   margin-bottom: 15px;
+
   padding: 10px 12px;
 
-  background: var(--error-background);
-  border: 1px solid var(--error);
-  border-radius: 8px;
+  border-radius: 7px;
 
-  color: var(--error);
+  background: #fff0f0;
+
+  color: #c62828;
+
+  font-size: 12px;
+}
+
+
+/* =====================================================
+   BUTTON LOGIN
+===================================================== */
+
+.login-submit {
+  width: 100%;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border: none;
+  border-radius: 7px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #06965d,
+      #078550
+    );
+
+  color: #ffffff;
 
   font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-weight: 700;
+
+  box-shadow:
+    0 7px 18px rgba(0, 133, 80, 0.18);
+}
+
+.login-submit:hover {
+  background:
+    linear-gradient(
+      135deg,
+      #078b58,
+      #057748
+    );
+}
+
+
+/* =====================================================
+   ORNAMEN LUAR HALAMAN
+===================================================== */
+
+.login-page-decoration {
+  position: absolute;
+
+  pointer-events: none;
+}
+
+.login-decoration-top {
+  width: 220px;
+  height: 220px;
+
+  top: -110px;
+  right: -80px;
+
+  border-radius: 50%;
+
+  background: rgba(179, 228, 211, 0.35);
+}
+
+.login-decoration-bottom {
+  width: 190px;
+  height: 190px;
+
+  bottom: -110px;
+  right: -70px;
+
+  border-radius: 50%;
+
+  background: rgba(179, 228, 211, 0.45);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .login-page {
+    padding: 20px;
+  }
+
+  .login-card {
+    max-width: 700px;
+  }
+
+  .login-info {
+    display: none;
+  }
+
+  .login-form-panel {
+    width: 100%;
+    min-height: 650px;
+
+    border-radius: 18px;
+
+    padding: 45px 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 12px;
+  }
+
+  .login-form-panel {
+    padding: 35px 22px;
+
+    min-height: 620px;
+  }
+
+  .login-form-logo {
+    margin-bottom: 28px;
+  }
+
+  .login-form-header h2 {
+    font-size: 23px;
+  }
+
+  .login-form-header p {
+    font-size: 12px;
+  }
+
+  .login-options {
+    margin-bottom: 20px;
+  }
 }

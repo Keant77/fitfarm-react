@@ -1,39 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 
 function Role() {
-  const [dataRole, setDataRole] = useState([
-    {
-      id: 1,
-      name: "Admin"
-    },
-    {
-      id: 2,
-      name: "Super Admin"
-    },
-    {
-      id: 3,
-      name: "Petugas Produksi"
-    },
-    {
-      id: 4,
-      name: "Petugas Pengawas"
-    }
-  ]);
+  const [dataRole, setDataRole] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
 
-  const filteredDataRole = dataRole.filter((role) =>
-  role.name.toLowerCase().includes(search.toLowerCase()) ||
-  String(role.id).includes(search)
-);
-
   const [formData, setFormData] = useState({
     name: ""
   });
+
+  // ================================
+  // GET DATA ROLE
+  // ================================
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((data) => {
+        const hasilMapping = data.map((user) => ({
+          id: user.id,
+          name: user.name
+        }));
+
+        setDataRole(hasilMapping);
+      })
+      .catch((error) => {
+        console.error("Gagal mengambil data role:", error);
+      });
+  }, []);
+
+  // ================================
+  // SEARCH
+  // ================================
+  const filteredDataRole = dataRole.filter(
+    (role) =>
+      role.name.toLowerCase().includes(search.toLowerCase()) ||
+      String(role.id).includes(search)
+  );
 
   // ================================
   // INPUT FORM
@@ -72,46 +78,108 @@ function Role() {
   };
 
   // ================================
-  // SIMPAN ROLE
+  // POST / PUT
   // ================================
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
+      alert("Nama role wajib diisi.");
       return;
     }
 
-    // EDIT
+    // ================================
+    // PUT - EDIT ROLE
+    // ================================
     if (editId !== null) {
-      setDataRole(
-        dataRole.map((role) =>
-          role.id === editId
-            ? {
-                ...role,
-                name: formData.name
-              }
-            : role
-        )
-      );
-    }
-
-    // TAMBAH
-    else {
-      const newRole = {
-        id:
-          dataRole.length > 0
-            ? Math.max(
-                ...dataRole.map((role) => role.id)
-              ) + 1
-            : 1,
-
+      const updatedRole = {
+        id: editId,
         name: formData.name
       };
 
-      setDataRole([
-        ...dataRole,
-        newRole
-      ]);
+      try {
+        console.log("PUT DIMULAI");
+        console.log("Data yang diubah:", updatedRole);
+
+        const response = await fetch(
+          `https://jsonplaceholder.typicode.com/users/${editId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedRole)
+          }
+        );
+
+        console.log("Status PUT:", response.status);
+
+        const hasil = await response.json();
+
+        console.log("HASIL RESPONSE PUT:", hasil);
+
+        // Update tampilan website
+        setDataRole(
+          dataRole.map((role) =>
+            role.id === editId
+              ? updatedRole
+              : role
+          )
+        );
+
+        alert("Role berhasil diubah!");
+      } catch (error) {
+        console.error("Gagal mengubah role:", error);
+        alert("Gagal mengubah role.");
+        return;
+      }
+    }
+
+    // ================================
+    // POST - TAMBAH ROLE
+    // ================================
+    else {
+      const newRole = {
+        name: formData.name
+      };
+
+      try {
+        console.log("POST DIMULAI");
+        console.log("Data yang dikirim:", newRole);
+
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/users",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newRole)
+          }
+        );
+
+        console.log("Status POST:", response.status);
+
+        const data = await response.json();
+
+        console.log("HASIL RESPONSE POST:", data);
+
+        const roleBaru = {
+          id: data.id,
+          name: data.name
+        };
+
+        setDataRole([
+          ...dataRole,
+          roleBaru
+        ]);
+
+        alert("Role berhasil ditambahkan!");
+      } catch (error) {
+        console.error("Gagal menambahkan role:", error);
+        alert("Gagal menambahkan role.");
+        return;
+      }
     }
 
     setShowForm(false);
@@ -124,9 +192,9 @@ function Role() {
   };
 
   // ================================
-  // HAPUS ROLE
+  // DELETE ROLE
   // ================================
-  const handleHapus = (id) => {
+  const handleHapus = async (id) => {
     const role = dataRole.find(
       (item) => item.id === id
     );
@@ -139,11 +207,37 @@ function Role() {
       return;
     }
 
-    setDataRole(
-      dataRole.filter(
-        (item) => item.id !== id
-      )
-    );
+    try {
+      console.log("DELETE DIMULAI");
+      console.log("ID yang dihapus:", id);
+
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/users/${id}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+      console.log("Status DELETE:", response.status);
+
+      if (!response.ok) {
+        throw new Error("Gagal menghapus data");
+      }
+
+      console.log("DELETE BERHASIL");
+
+      // Hapus dari tampilan website
+      setDataRole(
+        dataRole.filter(
+          (item) => item.id !== id
+        )
+      );
+
+      alert("Role berhasil dihapus!");
+    } catch (error) {
+      console.error("Gagal menghapus role:", error);
+      alert("Gagal menghapus role.");
+    }
   };
 
   return (
@@ -171,7 +265,7 @@ function Role() {
         <div className="data-toolbar">
 
           <Button onClick={handleTambah}>
-           ＋ Tambah
+            ＋ Tambah
           </Button>
 
           <input
@@ -179,7 +273,9 @@ function Role() {
             className="data-search"
             placeholder="Search..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
           />
 
         </div>
@@ -200,41 +296,47 @@ function Role() {
             <tbody>
 
               {filteredDataRole.length > 0 ? (
-                filteredDataRole.map((role, index) => (
-                  <tr key={role.id}>
+                filteredDataRole.map(
+                  (role, index) => (
+                    <tr key={role.id}>
 
-                    <td>
-                      {index + 1}
-                    </td>
+                      <td>
+                        {index + 1}
+                      </td>
 
-                    <td>
-                      {role.name}
-                    </td>
+                      <td>
+                        {role.name}
+                      </td>
 
-                    <td>
-                      <div className="data-action">
+                      <td>
+                        <div className="data-action">
 
-                        <Button
-                         variant="warning"
-                         size="sm"
-                         onClick={() => handleEdit(role)}
-                        >
-                          Edit
-                        </Button>
+                          <Button
+                            variant="warning"
+                            size="sm"
+                            onClick={() =>
+                              handleEdit(role)
+                            }
+                          >
+                            Edit
+                          </Button>
 
-                        <Button
-                         variant="destructive"
-                         size="sm"
-                          onClick={() => handleHapus(role.id)}
-                        >
-                           Hapus
-                        </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              handleHapus(role.id)
+                            }
+                          >
+                            Hapus
+                          </Button>
 
-                      </div>
-                    </td>
+                        </div>
+                      </td>
 
-                  </tr>
-                ))
+                    </tr>
+                  )
+                )
               ) : (
                 <tr>
                   <td
@@ -257,9 +359,7 @@ function Role() {
 
       </div>
 
-      {/* ================================
-          MODAL
-          ================================ */}
+      {/* MODAL */}
       {showForm && (
         <div className="user-modal-overlay">
 

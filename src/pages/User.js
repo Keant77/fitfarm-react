@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 
@@ -19,6 +19,25 @@ function User() {
       role_id: 3
     }
   ]);
+
+  useEffect(() => {
+  fetch("https://jsonplaceholder.typicode.com/users")
+    .then((response) => response.json())
+    .then((data) => {
+      const hasilMapping = data.map((user) => ({
+        id: user.id,
+        nama: user.name,
+        username: user.username,
+        password: "",
+        role_id: 1
+      }));
+
+      setDataUser(hasilMapping);
+    })
+    .catch((error) => {
+      console.error("Gagal mengambil data:", error);
+    });
+}, []);
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -50,10 +69,10 @@ function User() {
   };
 
   // ================================
-  // TAMBAH USER
-  // ================================
-  const handleTambah = () => {
-    setEditId(null);
+// TAMBAH USER
+// ================================
+const handleTambah = () => {
+  setEditId(null);
 
   setFormData({
     nama: "",
@@ -65,103 +84,194 @@ function User() {
   setShowForm(true);
 };
 
-  // ================================
-  // EDIT USER
-  // ================================
-  const handleEdit = (user) => {
-    setEditId(user.id);
+// ================================
+// EDIT USER
+// ================================
+const handleEdit = (user) => {
+  setEditId(user.id);
 
-    setFormData({
-      nama: user.nama,
-      username: user.username,
-      password: user.password,
-      role_id: user.role_id
-    });
+  setFormData({
+    nama: user.nama,
+    username: user.username,
+    password: "",
+    role_id: String(user.role_id)
+  });
 
-    setShowForm(true);
+  setShowForm(true);
+};
+
+ // ================================
+// SIMPAN USER
+// ================================
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (
+    !formData.nama ||
+    !formData.username ||
+    !formData.role_id
+  ) {
+    alert("Nama, username, dan role wajib diisi.");
+    return;
+  }
+
+  // ================================
+  // EDIT
+  // ================================
+  if (editId !== null) {
+  const updatedUser = {
+    id: editId,
+    nama: formData.nama,
+    username: formData.username,
+    password: formData.password,
+    role_id: Number(formData.role_id)
   };
 
-  // ================================
-  // SIMPAN USER
-  // ================================
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  try {
+    console.log("PUT DIMULAI");
+    console.log("Data yang diubah:", updatedUser);
 
-    if (
-      !formData.nama ||
-      !formData.username ||
-      !formData.role_id
-    ) {
-      alert("Nama, username, dan role wajib diisi.");
-      return;
-    }
+    const response = await fetch(
+      `https://jsonplaceholder.typicode.com/users/${editId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedUser)
+      }
+    );
 
-    // EDIT
-    if (editId !== null) {
-      setDataUser(
-        dataUser.map((user) =>
-          user.id === editId
-            ? {
-                ...user,
-                nama: formData.nama,
-                username: formData.username,
-                password: formData.password,
-                role_id: Number(formData.role_id)
-              }
-            : user
-        )
+    console.log("Status PUT:", response.status);
+
+    const hasil = await response.json();
+
+    console.log("HASIL RESPONSE PUT:", hasil);
+
+    // Update tampilan tabel
+    setDataUser(
+      dataUser.map((user) =>
+        user.id === editId
+          ? updatedUser
+          : user
+      )
+    );
+
+  } catch (error) {
+    console.error("Gagal mengubah user:", error);
+  }
+}
+
+  // ================================
+  // TAMBAH
+  // ================================
+  else {
+    const newUser = {
+      nama: formData.nama,
+      username: formData.username,
+      password: formData.password,
+      role_id: Number(formData.role_id)
+    };
+
+    try {
+      console.log("POST DIMULAI");
+      console.log("Data yang dikirim:", newUser);
+
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(newUser)
+        }
       );
-    }
 
-    // TAMBAH
-    else {
-      const newUser = {
-        id:
-          dataUser.length > 0
-            ? Math.max(...dataUser.map((user) => user.id)) + 1
-            : 1,
-        nama: formData.nama,
-        username: formData.username,
-        password: formData.password,
-        role_id: Number(formData.role_id)
+      console.log("Status:", response.status);
+
+      const data = await response.json();
+
+      console.log("HASIL RESPONSE POST:", data);
+
+      const userBaru = {
+        id: data.id,
+        nama: data.nama,
+        username: data.username,
+        password: data.password,
+        role_id: data.role_id
       };
 
-      setDataUser([...dataUser, newUser]);
+      setDataUser([...dataUser, userBaru]);
+
+      alert("Data user berhasil ditambahkan!");
+
+    } catch (error) {
+      console.error("Gagal menambahkan user:", error);
+      alert("Gagal menambahkan user.");
+      return;
     }
+  }
 
-    setShowForm(false);
+  setShowForm(false);
 
-    setFormData({
-      nama: "",
-      username: "",
-      password: "",
-      role_id: ""
-    });
+  setFormData({
+    nama: "",
+    username: "",
+    password: "",
+    role_id: ""
+  });
 
-    setEditId(null);
-  };
+  setEditId(null);
+};
 
   // ================================
   // HAPUS USER
   // ================================
-  const handleHapus = (id) => {
-    const user = dataUser.find(
-      (item) => item.id === id
+  const handleHapus = async (id) => {
+  const user = dataUser.find(
+    (item) => item.id === id
+  );
+
+  const yakin = window.confirm(
+    `Apakah kamu yakin ingin menghapus pengguna "${user.nama}"?`
+  );
+
+  if (!yakin) {
+    return;
+  }
+
+  try {
+    console.log("DELETE DIMULAI");
+    console.log("ID yang dihapus:", id);
+
+    const response = await fetch(
+      `https://jsonplaceholder.typicode.com/users/${id}`,
+      {
+        method: "DELETE"
+      }
     );
 
-    const yakin = window.confirm(
-      `Apakah kamu yakin ingin menghapus pengguna "${user.nama}"?`
-    );
+    console.log("Status DELETE:", response.status);
 
-    if (!yakin) {
-      return;
+    if (!response.ok) {
+      throw new Error("Gagal menghapus data");
     }
 
+    console.log("DELETE BERHASIL");
+
+    // Hapus dari tampilan React
     setDataUser(
       dataUser.filter((item) => item.id !== id)
     );
-  };
 
+    alert("Data user berhasil dihapus!");
+
+  } catch (error) {
+    console.error("Gagal menghapus user:", error);
+    alert("Gagal menghapus user.");
+  }
+};
   // ================================
   // TAMPILAN
   // ================================

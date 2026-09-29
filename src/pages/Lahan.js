@@ -1,100 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 
 function Lahan() {
-  const [dataLahan, setDataLahan] = useState([
-  {
-    id: 1,
-    nama: "Lahan Sumbersari 1",
-    latitude: "-8.172400",
-    longitude: "113.700000",
-    pengguna: "riska",
-    alamat: "Jl. Mastrip, Kecamatan Sumbersari, Kabupaten Jember"
-  },
-  {
-    id: 2,
-    nama: "Lahan Jombang 1",
-    latitude: "-8.145200",
-    longitude: "113.555800",
-    pengguna: "Petugas Sage",
-    alamat: "Desa Keting, Kecamatan Jombang, Kabupaten Jember"
-  },
-  {
-    id: 3,
-    nama: "Lahan Jombang 2",
-    latitude: "-8.149100",
-    longitude: "113.561200",
-    pengguna: "Petugas Sage",
-    alamat: "Desa Keting, Kecamatan Jombang, Kabupaten Jember"
-  },
-  {
-    id: 4,
-    nama: "Lahan Jombang 3",
-    latitude: "-8.153500",
-    longitude: "113.568400",
-    pengguna: "Petugas Sage",
-    alamat: "Desa Padomasan, Kecamatan Jombang, Kabupaten Jember"
-  },
-  {
-    id: 5,
-    nama: "Lahan Kencong 1",
-    latitude: "-8.285600",
-    longitude: "113.357800",
-    pengguna: "Petugas Sage",
-    alamat: "Desa Kencong, Kecamatan Kencong, Kabupaten Jember"
-  },
-  {
-    id: 6,
-    nama: "Lahan Kencong 2",
-    latitude: "-8.291300",
-    longitude: "113.365100",
-    pengguna: "Petugas Sage",
-    alamat: "Desa Wonorejo, Kecamatan Kencong, Kabupaten Jember"
-  },
-  {
-    id: 7,
-    nama: "Lahan Balung 1",
-    latitude: "-8.279800",
-    longitude: "113.538500",
-    pengguna: "Petugas Sage",
-    alamat: "Desa Balung Lor, Kecamatan Balung, Kabupaten Jember"
-  },
-  {
-    id: 8,
-    nama: "Lahan Puger 1",
-    latitude: "-8.367400",
-    longitude: "113.478600",
-    pengguna: "Petugas Sage",
-    alamat: "Desa Puger Kulon, Kecamatan Puger, Kabupaten Jember"
-  },
-  {
-    id: 9,
-    nama: "Lahan Ajung 1",
-    latitude: "-8.217500",
-    longitude: "113.670200",
-    pengguna: "Petugas Sage",
-    alamat: "Desa Ajung, Kecamatan Ajung, Kabupaten Jember"
-  },
-  {
-    id: 10,
-    nama: "Lahan Kaliwates 1",
-    latitude: "-8.171800",
-    longitude: "113.694500",
-    pengguna: "riska",
-    alamat: "Kecamatan Kaliwates, Kabupaten Jember"
-  }
-]);
+  const [dataLahan, setDataLahan] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
-
-  const filteredDataLahan = dataLahan.filter((lahan) =>
-  lahan.nama.toLowerCase().includes(search.toLowerCase()) ||
-  lahan.pengguna.toLowerCase().includes(search.toLowerCase()) ||
-  lahan.alamat.toLowerCase().includes(search.toLowerCase())
-);
 
   const [formData, setFormData] = useState({
     nama: "",
@@ -103,6 +16,61 @@ function Lahan() {
     pengguna: "",
     alamat: ""
   });
+
+  // ================================
+  // GET DATA LAHAN
+  // ================================
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((data) => {
+        const hasilMapping = data.map((user) => ({
+          id: user.id,
+          nama: user.name,
+
+          // JSONPlaceholder tidak punya latitude
+          // dan longitude, jadi kita buat dummy
+          latitude: (-8.15 - user.id * 0.01).toFixed(6),
+
+          longitude: (113.65 + user.id * 0.01).toFixed(6),
+
+          // Data pengguna dari API
+          pengguna: user.username,
+
+          // Alamat dari data API
+          alamat: `${user.address.street}, ${user.address.city}`
+        }));
+
+        console.log(
+          "HASIL GET LAHAN:",
+          hasilMapping
+        );
+
+        setDataLahan(hasilMapping);
+      })
+      .catch((error) => {
+        console.error(
+          "Gagal mengambil data lahan:",
+          error
+        );
+      });
+  }, []);
+
+  // ================================
+  // SEARCH
+  // ================================
+  const filteredDataLahan =
+    dataLahan.filter((lahan) =>
+      lahan.nama
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      lahan.pengguna
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      lahan.alamat
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
 
   // ================================
   // INPUT FORM
@@ -149,11 +117,14 @@ function Lahan() {
   };
 
   // ================================
-  // SIMPAN
+  // POST / PUT
   // ================================
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // ================================
+    // VALIDASI
+    // ================================
     if (
       !formData.nama.trim() ||
       !formData.latitude.trim() ||
@@ -161,39 +132,19 @@ function Lahan() {
       !formData.pengguna.trim() ||
       !formData.alamat.trim()
     ) {
+      alert(
+        "Semua data lahan wajib diisi."
+      );
+
       return;
     }
 
-    // EDIT
+    // ================================
+    // PUT - EDIT LAHAN
+    // ================================
     if (editId !== null) {
-      setDataLahan(
-        dataLahan.map((lahan) =>
-          lahan.id === editId
-            ? {
-                ...lahan,
-                nama: formData.nama,
-                latitude: formData.latitude,
-                longitude: formData.longitude,
-                pengguna: formData.pengguna,
-                alamat: formData.alamat
-              }
-            : lahan
-        )
-      );
-    }
-
-    // TAMBAH
-    else {
-      const newLahan = {
-        id:
-          dataLahan.length > 0
-            ? Math.max(
-                ...dataLahan.map(
-                  (lahan) => lahan.id
-                )
-              ) + 1
-            : 1,
-
+      const updatedLahan = {
+        id: editId,
         nama: formData.nama,
         latitude: formData.latitude,
         longitude: formData.longitude,
@@ -201,12 +152,144 @@ function Lahan() {
         alamat: formData.alamat
       };
 
-      setDataLahan([
-        ...dataLahan,
-        newLahan
-      ]);
+      try {
+        console.log("PUT DIMULAI");
+
+        console.log(
+          "Data yang diubah:",
+          updatedLahan
+        );
+
+        const response = await fetch(
+          `https://jsonplaceholder.typicode.com/users/${editId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(
+              updatedLahan
+            )
+          }
+        );
+
+        console.log(
+          "Status PUT:",
+          response.status
+        );
+
+        const hasil =
+          await response.json();
+
+        console.log(
+          "HASIL RESPONSE PUT:",
+          hasil
+        );
+
+        // Update tampilan website
+        setDataLahan(
+          dataLahan.map((lahan) =>
+            lahan.id === editId
+              ? updatedLahan
+              : lahan
+          )
+        );
+
+        alert(
+          "Lahan berhasil diubah!"
+        );
+      } catch (error) {
+        console.error(
+          "Gagal mengubah lahan:",
+          error
+        );
+
+        alert(
+          "Gagal mengubah lahan."
+        );
+
+        return;
+      }
     }
 
+    // ================================
+    // POST - TAMBAH LAHAN
+    // ================================
+    else {
+      const newLahan = {
+        nama: formData.nama,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        pengguna: formData.pengguna,
+        alamat: formData.alamat
+      };
+
+      try {
+        console.log("POST DIMULAI");
+
+        console.log(
+          "Data yang dikirim:",
+          newLahan
+        );
+
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/users",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newLahan)
+          }
+        );
+
+        console.log(
+          "Status POST:",
+          response.status
+        );
+
+        const data =
+          await response.json();
+
+        console.log(
+          "HASIL RESPONSE POST:",
+          data
+        );
+
+        const lahanBaru = {
+          id: data.id,
+          nama: data.nama,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          pengguna: data.pengguna,
+          alamat: data.alamat
+        };
+
+        setDataLahan([
+          ...dataLahan,
+          lahanBaru
+        ]);
+
+        alert(
+          "Lahan berhasil ditambahkan!"
+        );
+      } catch (error) {
+        console.error(
+          "Gagal menambahkan lahan:",
+          error
+        );
+
+        alert(
+          "Gagal menambahkan lahan."
+        );
+
+        return;
+      }
+    }
+
+    // ================================
+    // RESET FORM
+    // ================================
     setShowForm(false);
 
     setFormData({
@@ -221,9 +304,9 @@ function Lahan() {
   };
 
   // ================================
-  // HAPUS
+  // DELETE LAHAN
   // ================================
-  const handleHapus = (id) => {
+  const handleHapus = async (id) => {
     const lahan = dataLahan.find(
       (item) => item.id === id
     );
@@ -236,39 +319,104 @@ function Lahan() {
       return;
     }
 
-    setDataLahan(
-      dataLahan.filter(
-        (item) => item.id !== id
-      )
-    );
+    try {
+      console.log(
+        "DELETE DIMULAI"
+      );
+
+      console.log(
+        "ID yang dihapus:",
+        id
+      );
+
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/users/${id}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+      console.log(
+        "Status DELETE:",
+        response.status
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Gagal menghapus data"
+        );
+      }
+
+      console.log(
+        "DELETE BERHASIL"
+      );
+
+      // Hapus dari tampilan
+      setDataLahan(
+        dataLahan.filter(
+          (item) => item.id !== id
+        )
+      );
+
+      alert(
+        "Lahan berhasil dihapus!"
+      );
+    } catch (error) {
+      console.error(
+        "Gagal menghapus lahan:",
+        error
+      );
+
+      alert(
+        "Gagal menghapus lahan."
+      );
+    }
   };
 
   return (
     <div className="data-page">
 
-      {/* HEADER */}
+      {/* ================================
+          HEADER
+          ================================ */}
       <div className="data-page-header">
+
         <div>
-          <h1>DATA LAHAN</h1>
+
+          <h1>
+            DATA LAHAN
+          </h1>
 
           <p>
             Data lahan pertanian sistem MaizeFit
           </p>
+
         </div>
+
       </div>
 
-      {/* TABLE CARD */}
+      {/* ================================
+          TABLE CARD
+          ================================ */}
       <div className="data-table-card">
 
         <div className="data-table-header">
-          <h2>Data Lahan</h2>
+
+          <h2>
+            Data Lahan
+          </h2>
+
         </div>
 
-        {/* TOOLBAR */}
+        {/* ================================
+            TOOLBAR
+            ================================ */}
         <div className="data-toolbar">
 
-          <Button onClick={handleTambah}>
-           ＋ Tambah
+          <Button
+            onClick={handleTambah}
+          >
+            ＋ Tambah
           </Button>
 
           <Input
@@ -276,35 +424,67 @@ function Lahan() {
             className="data-search"
             placeholder="Search..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
           />
 
         </div>
 
-        {/* TABLE */}
+        {/* ================================
+            TABLE
+            ================================ */}
         <div className="data-table-wrapper">
 
           <table className="data-table">
 
             <thead>
+
               <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Pengguna</th>
-                <th>Alamat</th>
-                <th>Action</th>
+
+                <th>
+                  No
+                </th>
+
+                <th>
+                  Nama
+                </th>
+
+                <th>
+                  Latitude
+                </th>
+
+                <th>
+                  Longitude
+                </th>
+
+                <th>
+                  Pengguna
+                </th>
+
+                <th>
+                  Alamat
+                </th>
+
+                <th>
+                  Action
+                </th>
+
               </tr>
+
             </thead>
 
             <tbody>
 
-              {filteredDataLahan.length > 0 ? (
+              {filteredDataLahan.length >
+              0 ? (
 
                 filteredDataLahan.map(
                   (lahan, index) => (
-                    <tr key={lahan.id}>
+
+                    <tr
+                      key={lahan.id}
+                    >
 
                       <td>
                         {index + 1}
@@ -331,43 +511,58 @@ function Lahan() {
                       </td>
 
                       <td>
+
                         <div className="data-action">
 
                           <Button
-                           variant="warning"
-                           size="sm"
-                            onClick={() => handleEdit(lahan)}
+                            variant="warning"
+                            size="sm"
+                            onClick={() =>
+                              handleEdit(
+                                lahan
+                              )
+                            }
                           >
                             Edit
                           </Button>
 
                           <Button
-                           variant="destructive"
-                           size="sm"
-                            onClick={() => handleHapus(lahan.id)}
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              handleHapus(
+                                lahan.id
+                              )
+                            }
                           >
                             Hapus
                           </Button>
 
                         </div>
+
                       </td>
 
                     </tr>
+
                   )
                 )
 
               ) : (
 
                 <tr>
+
                   <td
                     colSpan="7"
                     style={{
-                      textAlign: "center",
-                      padding: "40px"
+                      textAlign:
+                        "center",
+                      padding:
+                        "40px"
                     }}
                   >
                     Belum ada data lahan.
                   </td>
+
                 </tr>
 
               )}
@@ -392,9 +587,11 @@ function Lahan() {
             <div className="user-modal-header">
 
               <h2>
+
                 {editId !== null
                   ? "Edit Lahan"
                   : "Tambah Lahan"}
+
               </h2>
 
               <button
@@ -409,7 +606,9 @@ function Lahan() {
 
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={handleSubmit}
+            >
 
               {/* NAMA */}
               <div className="user-form-group">
@@ -418,7 +617,7 @@ function Lahan() {
                   Nama
                 </label>
 
-                <input
+                <Input
                   type="text"
                   name="nama"
                   value={formData.nama}
@@ -436,11 +635,13 @@ function Lahan() {
                   Latitude
                 </label>
 
-                <input
+                <Input
                   type="number"
                   step="any"
                   name="latitude"
-                  value={formData.latitude}
+                  value={
+                    formData.latitude
+                  }
                   onChange={handleChange}
                   placeholder="Contoh: -8.1724"
                 />
@@ -454,11 +655,13 @@ function Lahan() {
                   Longitude
                 </label>
 
-                <input
+                <Input
                   type="number"
                   step="any"
                   name="longitude"
-                  value={formData.longitude}
+                  value={
+                    formData.longitude
+                  }
                   onChange={handleChange}
                   placeholder="Contoh: 113.7000"
                 />
@@ -472,10 +675,12 @@ function Lahan() {
                   Pengguna
                 </label>
 
-                <input
+                <Input
                   type="text"
                   name="pengguna"
-                  value={formData.pengguna}
+                  value={
+                    formData.pengguna
+                  }
                   onChange={handleChange}
                   placeholder="Masukkan pengguna"
                 />
@@ -489,10 +694,12 @@ function Lahan() {
                   Alamat
                 </label>
 
-                <input
+                <Input
                   type="text"
                   name="alamat"
-                  value={formData.alamat}
+                  value={
+                    formData.alamat
+                  }
                   onChange={handleChange}
                   placeholder="Masukkan alamat lahan"
                 />
@@ -526,6 +733,7 @@ function Lahan() {
           </div>
 
         </div>
+
       )}
 
     </div>

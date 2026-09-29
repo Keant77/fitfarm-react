@@ -1,91 +1,198 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 
 function RiwayatPenilaian() {
-  const [dataRiwayat] = useState([
-    {
-      id: 1,
-      lahan: "Lahan Sumbersari 1",
-      tanggal: "10-09-2026",
-      skor_kelayakan: 0.86,
-      probabilitas: 86
-    },
-    {
-      id: 2,
-      lahan: "Lahan Jombang 1",
-      tanggal: "10-09-2026",
-      skor_kelayakan: 0.72,
-      probabilitas: 72
-    },
-    {
-      id: 3,
-      lahan: "Lahan Jombang 2",
-      tanggal: "09-09-2026",
-      skor_kelayakan: 0.91,
-      probabilitas: 91
-    },
-    {
-      id: 4,
-      lahan: "Lahan Jombang 3",
-      tanggal: "09-09-2026",
-      skor_kelayakan: 0.65,
-      probabilitas: 65
-    },
-    {
-      id: 5,
-      lahan: "Lahan Kencong 1",
-      tanggal: "08-09-2026",
-      skor_kelayakan: 0.78,
-      probabilitas: 78
-    },
-    {
-      id: 6,
-      lahan: "Lahan Kencong 2",
-      tanggal: "08-09-2026",
-      skor_kelayakan: 0.58,
-      probabilitas: 58
-    },
-    {
-      id: 7,
-      lahan: "Lahan Balung 1",
-      tanggal: "07-09-2026",
-      skor_kelayakan: 0.83,
-      probabilitas: 83
-    },
-    {
-      id: 8,
-      lahan: "Lahan Puger 1",
-      tanggal: "07-09-2026",
-      skor_kelayakan: 0.69,
-      probabilitas: 69
-    },
-    {
-      id: 9,
-      lahan: "Lahan Ajung 1",
-      tanggal: "06-09-2026",
-      skor_kelayakan: 0.88,
-      probabilitas: 88
-    },
-    {
-      id: 10,
-      lahan: "Lahan Kaliwates 1",
-      tanggal: "05-09-2026",
-      skor_kelayakan: 0.76,
-      probabilitas: 76
-    }
-  ]);
+  const [dataRiwayat, setDataRiwayat] = useState([]);
 
   const [search, setSearch] = useState("");
 
   // Data yang sedang dilihat
   const [selectedData, setSelectedData] = useState(null);
 
-  const dataFiltered = dataRiwayat.filter((item) =>
-    item.lahan
-      .toLowerCase()
-      .includes(search.toLowerCase())
+  // Modal tambah
+  const [showForm, setShowForm] = useState(false);
+
+  const [formData, setFormData] = useState({
+    lahan: "",
+    tanggal: "",
+    skor_kelayakan: "",
+    probabilitas: ""
+  });
+
+  // ================================
+  // GET DATA RIWAYAT
+  // ================================
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/posts")
+      .then((response) => response.json())
+      .then((data) => {
+        const hasilMapping = data
+          .slice(0, 10)
+          .map((item, index) => ({
+            id: item.id,
+            lahan: `Lahan ${item.title
+              .split(" ")
+              .slice(0, 2)
+              .join(" ")}`,
+            tanggal: `0${10 - index}-09-2026`,
+            skor_kelayakan: (
+              0.60 +
+              index * 0.03
+            ).toFixed(2),
+            probabilitas:
+              60 + index * 3
+          }));
+
+        console.log(
+          "HASIL GET RIWAYAT:",
+          hasilMapping
+        );
+
+        setDataRiwayat(hasilMapping);
+      })
+      .catch((error) => {
+        console.error(
+          "Gagal mengambil data riwayat:",
+          error
+        );
+      });
+  }, []);
+
+  // ================================
+  // SEARCH
+  // ================================
+  const dataFiltered = dataRiwayat.filter(
+    (item) =>
+      item.lahan
+        .toLowerCase()
+        .includes(search.toLowerCase())
   );
+
+  // ================================
+  // INPUT FORM
+  // ================================
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // ================================
+  // BUKA FORM TAMBAH
+  // ================================
+  const handleTambah = () => {
+    setFormData({
+      lahan: "",
+      tanggal: "",
+      skor_kelayakan: "",
+      probabilitas: ""
+    });
+
+    setShowForm(true);
+  };
+
+  // ================================
+  // POST - TAMBAH RIWAYAT
+  // ================================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (
+      !formData.lahan.trim() ||
+      !formData.tanggal.trim() ||
+      !formData.skor_kelayakan ||
+      !formData.probabilitas
+    ) {
+      alert(
+        "Semua data riwayat wajib diisi."
+      );
+
+      return;
+    }
+
+    const newRiwayat = {
+      lahan: formData.lahan,
+      tanggal: formData.tanggal,
+      skor_kelayakan:
+        Number(formData.skor_kelayakan),
+      probabilitas:
+        Number(formData.probabilitas)
+    };
+
+    try {
+      console.log("POST DIMULAI");
+
+      console.log(
+        "Data yang dikirim:",
+        newRiwayat
+      );
+
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(
+            newRiwayat
+          )
+        }
+      );
+
+      console.log(
+        "Status POST:",
+        response.status
+      );
+
+      const data =
+        await response.json();
+
+      console.log(
+        "HASIL RESPONSE POST:",
+        data
+      );
+
+      const riwayatBaru = {
+        id: data.id,
+        lahan: data.lahan,
+        tanggal: data.tanggal,
+        skor_kelayakan:
+          data.skor_kelayakan,
+        probabilitas:
+          data.probabilitas
+      };
+
+      setDataRiwayat([
+        ...dataRiwayat,
+        riwayatBaru
+      ]);
+
+      alert(
+        "Riwayat penilaian berhasil ditambahkan!"
+      );
+
+      setShowForm(false);
+
+      setFormData({
+        lahan: "",
+        tanggal: "",
+        skor_kelayakan: "",
+        probabilitas: ""
+      });
+    } catch (error) {
+      console.error(
+        "Gagal menambahkan riwayat:",
+        error
+      );
+
+      alert(
+        "Gagal menambahkan riwayat."
+      );
+    }
+  };
 
   // ================================
   // BUKA DETAIL
@@ -104,26 +211,49 @@ function RiwayatPenilaian() {
   return (
     <div className="data-page">
 
-      {/* HEADER */}
+      {/* ================================
+          HEADER
+          ================================ */}
       <div className="data-page-header">
+
         <div>
-          <h1>RIWAYAT PENILAIAN</h1>
+
+          <h1>
+            RIWAYAT PENILAIAN
+          </h1>
 
           <p>
-            Riwayat hasil penilaian kelayakan lahan MaizeFit
+            Riwayat hasil penilaian
+            kelayakan lahan MaizeFit
           </p>
+
         </div>
+
       </div>
 
-      {/* TABLE CARD */}
+      {/* ================================
+          TABLE CARD
+          ================================ */}
       <div className="data-table-card">
 
         <div className="data-table-header">
-          <h2>Data Riwayat Penilaian</h2>
+
+          <h2>
+            Data Riwayat Penilaian
+          </h2>
+
         </div>
 
-        {/* TOOLBAR */}
+        {/* ================================
+            TOOLBAR
+            ================================ */}
         <div className="data-toolbar">
+
+          <Button
+            onClick={handleTambah}
+          >
+            ＋ Tambah Riwayat
+          </Button>
 
           <Input
             type="text"
@@ -137,20 +267,43 @@ function RiwayatPenilaian() {
 
         </div>
 
-        {/* TABLE */}
+        {/* ================================
+            TABLE
+            ================================ */}
         <div className="data-table-wrapper">
 
           <table className="data-table">
 
             <thead>
+
               <tr>
-                <th>No</th>
-                <th>Lahan</th>
-                <th>Tanggal</th>
-                <th>Skor Kelayakan</th>
-                <th>Probabilitas</th>
-                <th>Action</th>
+
+                <th>
+                  No
+                </th>
+
+                <th>
+                  Lahan
+                </th>
+
+                <th>
+                  Tanggal
+                </th>
+
+                <th>
+                  Skor Kelayakan
+                </th>
+
+                <th>
+                  Probabilitas
+                </th>
+
+                <th>
+                  Action
+                </th>
+
               </tr>
+
             </thead>
 
             <tbody>
@@ -159,7 +312,10 @@ function RiwayatPenilaian() {
 
                 dataFiltered.map(
                   (riwayat, index) => (
-                    <tr key={riwayat.id}>
+
+                    <tr
+                      key={riwayat.id}
+                    >
 
                       <td>
                         {index + 1}
@@ -182,35 +338,47 @@ function RiwayatPenilaian() {
                       </td>
 
                       <td>
+
                         <div className="data-action">
 
                           <Button
                             variant="warning"
                             size="sm"
-                            onClick={() => handleDetail(riwayat)}
+                            onClick={() =>
+                              handleDetail(
+                                riwayat
+                              )
+                            }
                           >
                             Detail
                           </Button>
 
                         </div>
+
                       </td>
 
                     </tr>
+
                   )
                 )
 
               ) : (
 
                 <tr>
+
                   <td
                     colSpan="6"
                     style={{
-                      textAlign: "center",
-                      padding: "30px"
+                      textAlign:
+                        "center",
+                      padding:
+                        "30px"
                     }}
                   >
-                    Data riwayat tidak ditemukan.
+                    Data riwayat
+                    tidak ditemukan.
                   </td>
+
                 </tr>
 
               )}
@@ -222,6 +390,148 @@ function RiwayatPenilaian() {
         </div>
 
       </div>
+
+      {/* ================================
+          MODAL TAMBAH RIWAYAT
+          ================================ */}
+      {showForm && (
+
+        <div className="user-modal-overlay">
+
+          <div className="user-modal">
+
+            <div className="user-modal-header">
+
+              <h2>
+                Tambah Riwayat
+              </h2>
+
+              <button
+                type="button"
+                className="user-modal-close"
+                onClick={() =>
+                  setShowForm(false)
+                }
+              >
+                ×
+              </button>
+
+            </div>
+
+            <form
+              onSubmit={handleSubmit}
+            >
+
+              {/* LAHAN */}
+              <div className="user-form-group">
+
+                <label>
+                  Nama Lahan
+                </label>
+
+                <Input
+                  type="text"
+                  name="lahan"
+                  value={
+                    formData.lahan
+                  }
+                  onChange={handleChange}
+                  placeholder="Masukkan nama lahan"
+                  autoFocus
+                />
+
+              </div>
+
+              {/* TANGGAL */}
+              <div className="user-form-group">
+
+                <label>
+                  Tanggal Penilaian
+                </label>
+
+                <Input
+                  type="date"
+                  name="tanggal"
+                  value={
+                    formData.tanggal
+                  }
+                  onChange={handleChange}
+                />
+
+              </div>
+
+              {/* SKOR */}
+              <div className="user-form-group">
+
+                <label>
+                  Skor Kelayakan
+                </label>
+
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="1"
+                  name="skor_kelayakan"
+                  value={
+                    formData.skor_kelayakan
+                  }
+                  onChange={handleChange}
+                  placeholder="Contoh: 0.86"
+                />
+
+              </div>
+
+              {/* PROBABILITAS */}
+              <div className="user-form-group">
+
+                <label>
+                  Probabilitas (%)
+                </label>
+
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  name="probabilitas"
+                  value={
+                    formData.probabilitas
+                  }
+                  onChange={handleChange}
+                  placeholder="Contoh: 86"
+                />
+
+              </div>
+
+              {/* BUTTON */}
+              <div className="user-form-actions">
+
+                <button
+                  type="button"
+                  className="user-cancel-button"
+                  onClick={() =>
+                    setShowForm(false)
+                  }
+                >
+                  Batal
+                </button>
+
+                <button
+                  type="submit"
+                  className="user-save-button"
+                >
+                  Simpan
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      )}
 
       {/* ================================
           MODAL DETAIL
@@ -241,7 +551,9 @@ function RiwayatPenilaian() {
               <button
                 type="button"
                 className="user-modal-close"
-                onClick={handleCloseDetail}
+                onClick={
+                  handleCloseDetail
+                }
               >
                 ×
               </button>
@@ -251,31 +563,55 @@ function RiwayatPenilaian() {
             <div className="detail-riwayat">
 
               <div className="detail-item">
-                <span>Nama Lahan</span>
+
+                <span>
+                  Nama Lahan
+                </span>
+
                 <strong>
                   {selectedData.lahan}
                 </strong>
+
               </div>
 
               <div className="detail-item">
-                <span>Tanggal Penilaian</span>
+
+                <span>
+                  Tanggal Penilaian
+                </span>
+
                 <strong>
                   {selectedData.tanggal}
                 </strong>
+
               </div>
 
               <div className="detail-item">
-                <span>Skor Kelayakan</span>
+
+                <span>
+                  Skor Kelayakan
+                </span>
+
                 <strong>
-                  {selectedData.skor_kelayakan}
+                  {
+                    selectedData.skor_kelayakan
+                  }
                 </strong>
+
               </div>
 
               <div className="detail-item">
-                <span>Probabilitas</span>
+
+                <span>
+                  Probabilitas
+                </span>
+
                 <strong>
-                  {selectedData.probabilitas}%
+                  {
+                    selectedData.probabilitas
+                  }%
                 </strong>
+
               </div>
 
             </div>
@@ -285,7 +621,9 @@ function RiwayatPenilaian() {
               <button
                 type="button"
                 className="user-cancel-button"
-                onClick={handleCloseDetail}
+                onClick={
+                  handleCloseDetail
+                }
               >
                 Tutup
               </button>

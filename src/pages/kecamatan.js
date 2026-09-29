@@ -1,54 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 
 function Kecamatan() {
-  const [dataKecamatan, setDataKecamatan] = useState([
-    { id: 1, nama: "Ajung" },
-    { id: 2, nama: "Ambulu" },
-    { id: 3, nama: "Arjasa" },
-    { id: 4, nama: "Balung" },
-    { id: 5, nama: "Bangsalsari" },
-    { id: 6, nama: "Gumukmas" },
-    { id: 7, nama: "Jelbuk" },
-    { id: 8, nama: "Jenggawah" },
-    { id: 9, nama: "Jombang" },
-    { id: 10, nama: "Kalisat" },
-    { id: 11, nama: "Kaliwates" },
-    { id: 12, nama: "Kencong" },
-    { id: 13, nama: "Ledokombo" },
-    { id: 14, nama: "Mayang" },
-    { id: 15, nama: "Mumbulsari" },
-    { id: 16, nama: "Pakusari" },
-    { id: 17, nama: "Panti" },
-    { id: 18, nama: "Patrang" },
-    { id: 19, nama: "Puger" },
-    { id: 20, nama: "Rambipuji" },
-    { id: 21, nama: "Semboro" },
-    { id: 22, nama: "Silo" },
-    { id: 23, nama: "Sukorambi" },
-    { id: 24, nama: "Sukowono" },
-    { id: 25, nama: "Sumberbaru" },
-    { id: 26, nama: "Sumberjambe" },
-    { id: 27, nama: "Sumbersari" },
-    { id: 28, nama: "Tanggul" },
-    { id: 29, nama: "Tempurejo" },
-    { id: 30, nama: "Umbulsari" },
-    { id: 31, nama: "Wuluhan" }
-  ]);
+  const [dataKecamatan, setDataKecamatan] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
 
-  const filteredDataKecamatan = dataKecamatan.filter((kecamatan) =>
-  kecamatan.nama.toLowerCase().includes(search.toLowerCase()) ||
-  String(kecamatan.id).includes(search)
-);
-
   const [formData, setFormData] = useState({
     nama: ""
   });
+
+  // ================================
+  // GET DATA KECAMATAN
+  // ================================
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((data) => {
+        const hasilMapping = data.map((user) => ({
+          id: user.id,
+          nama: user.name
+        }));
+
+        setDataKecamatan(hasilMapping);
+      })
+      .catch((error) => {
+        console.error(
+          "Gagal mengambil data kecamatan:",
+          error
+        );
+      });
+  }, []);
+
+  // ================================
+  // SEARCH
+  // ================================
+  const filteredDataKecamatan =
+    dataKecamatan.filter(
+      (kecamatan) =>
+        kecamatan.nama
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        String(kecamatan.id).includes(search)
+    );
 
   // ================================
   // INPUT
@@ -87,48 +84,147 @@ function Kecamatan() {
   };
 
   // ================================
-  // SIMPAN
+  // POST / PUT
   // ================================
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.nama.trim()) {
+      alert("Nama kecamatan wajib diisi.");
       return;
     }
 
-    // EDIT
+    // ================================
+    // PUT - EDIT
+    // ================================
     if (editId !== null) {
-      setDataKecamatan(
-        dataKecamatan.map((kecamatan) =>
-          kecamatan.id === editId
-            ? {
-                ...kecamatan,
-                nama: formData.nama
-              }
-            : kecamatan
-        )
-      );
-    }
-
-    // TAMBAH
-    else {
-      const newKecamatan = {
-        id:
-          dataKecamatan.length > 0
-            ? Math.max(
-                ...dataKecamatan.map(
-                  (kecamatan) => kecamatan.id
-                )
-              ) + 1
-            : 1,
-
+      const updatedKecamatan = {
+        id: editId,
         nama: formData.nama
       };
 
-      setDataKecamatan([
-        ...dataKecamatan,
-        newKecamatan
-      ]);
+      try {
+        console.log("PUT DIMULAI");
+        console.log(
+          "Data yang diubah:",
+          updatedKecamatan
+        );
+
+        const response = await fetch(
+          `https://jsonplaceholder.typicode.com/users/${editId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(
+              updatedKecamatan
+            )
+          }
+        );
+
+        console.log(
+          "Status PUT:",
+          response.status
+        );
+
+        const hasil = await response.json();
+
+        console.log(
+          "HASIL RESPONSE PUT:",
+          hasil
+        );
+
+        setDataKecamatan(
+          dataKecamatan.map((kecamatan) =>
+            kecamatan.id === editId
+              ? updatedKecamatan
+              : kecamatan
+          )
+        );
+
+        alert(
+          "Kecamatan berhasil diubah!"
+        );
+      } catch (error) {
+        console.error(
+          "Gagal mengubah kecamatan:",
+          error
+        );
+
+        alert(
+          "Gagal mengubah kecamatan."
+        );
+
+        return;
+      }
+    }
+
+    // ================================
+    // POST - TAMBAH
+    // ================================
+    else {
+      const newKecamatan = {
+        nama: formData.nama
+      };
+
+      try {
+        console.log("POST DIMULAI");
+        console.log(
+          "Data yang dikirim:",
+          newKecamatan
+        );
+
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/users",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(
+              newKecamatan
+            )
+          }
+        );
+
+        console.log(
+          "Status POST:",
+          response.status
+        );
+
+        const data = await response.json();
+
+        console.log(
+          "HASIL RESPONSE POST:",
+          data
+        );
+
+        const kecamatanBaru = {
+          id: data.id,
+          nama: data.nama
+        };
+
+        setDataKecamatan([
+          ...dataKecamatan,
+          kecamatanBaru
+        ]);
+
+        alert(
+          "Kecamatan berhasil ditambahkan!"
+        );
+      } catch (error) {
+        console.error(
+          "Gagal menambahkan kecamatan:",
+          error
+        );
+
+        alert(
+          "Gagal menambahkan kecamatan."
+        );
+
+        return;
+      }
     }
 
     setShowForm(false);
@@ -141,9 +237,9 @@ function Kecamatan() {
   };
 
   // ================================
-  // HAPUS
+  // DELETE
   // ================================
-  const handleHapus = (id) => {
+  const handleHapus = async (id) => {
     const kecamatan = dataKecamatan.find(
       (item) => item.id === id
     );
@@ -156,11 +252,54 @@ function Kecamatan() {
       return;
     }
 
-    setDataKecamatan(
-      dataKecamatan.filter(
-        (item) => item.id !== id
-      )
-    );
+    try {
+      console.log("DELETE DIMULAI");
+      console.log(
+        "ID yang dihapus:",
+        id
+      );
+
+      const response = await fetch(
+        `https://jsonplaceholder.typicode.com/users/${id}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+      console.log(
+        "Status DELETE:",
+        response.status
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Gagal menghapus data"
+        );
+      }
+
+      console.log(
+        "DELETE BERHASIL"
+      );
+
+      setDataKecamatan(
+        dataKecamatan.filter(
+          (item) => item.id !== id
+        )
+      );
+
+      alert(
+        "Kecamatan berhasil dihapus!"
+      );
+    } catch (error) {
+      console.error(
+        "Gagal menghapus kecamatan:",
+        error
+      );
+
+      alert(
+        "Gagal menghapus kecamatan."
+      );
+    }
   };
 
   return (
@@ -188,7 +327,7 @@ function Kecamatan() {
         <div className="data-toolbar">
 
           <Button onClick={handleTambah}>
-           ＋ Tambah
+            ＋ Tambah
           </Button>
 
           <Input
@@ -196,7 +335,9 @@ function Kecamatan() {
             className="data-search"
             placeholder="Search..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
           />
 
         </div>
@@ -216,42 +357,68 @@ function Kecamatan() {
 
             <tbody>
 
-              {filteredDataKecamatan.map(
-                (kecamatan, index) => (
-                  <tr key={kecamatan.id}>
+              {filteredDataKecamatan.length >
+              0 ? (
+                filteredDataKecamatan.map(
+                  (kecamatan, index) => (
+                    <tr
+                      key={kecamatan.id}
+                    >
 
-                    <td>
-                      {index + 1}
-                    </td>
+                      <td>
+                        {index + 1}
+                      </td>
 
-                    <td>
-                      {kecamatan.nama}
-                    </td>
+                      <td>
+                        {kecamatan.nama}
+                      </td>
 
-                    <td>
-                      <div className="data-action">
+                      <td>
+                        <div className="data-action">
 
-                        <Button
-                         variant="warning"
-                          size="sm"
-                         onClick={() => handleEdit(kecamatan)}
-                        >
-                         Edit
-                        </Button>
+                          <Button
+                            variant="warning"
+                            size="sm"
+                            onClick={() =>
+                              handleEdit(
+                                kecamatan
+                              )
+                            }
+                          >
+                            Edit
+                          </Button>
 
-                        <Button
-                         variant="destructive"
-                          size="sm"
-                         onClick={() => handleHapus(kecamatan.id)}
-                        >
-                           Hapus
-                        </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              handleHapus(
+                                kecamatan.id
+                              )
+                            }
+                          >
+                            Hapus
+                          </Button>
 
-                      </div>
-                    </td>
+                        </div>
+                      </td>
 
-                  </tr>
+                    </tr>
+                  )
                 )
+              ) : (
+                <tr>
+                  <td
+                    colSpan="3"
+                    style={{
+                      textAlign: "center",
+                      padding: "30px"
+                    }}
+                  >
+                    Belum ada data
+                    kecamatan.
+                  </td>
+                </tr>
               )}
 
             </tbody>
@@ -288,7 +455,9 @@ function Kecamatan() {
 
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={handleSubmit}
+            >
 
               <div className="user-form-group">
 
@@ -296,7 +465,7 @@ function Kecamatan() {
                   Nama Kecamatan
                 </label>
 
-                <input
+                <Input
                   type="text"
                   name="nama"
                   value={formData.nama}
