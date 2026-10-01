@@ -34,7 +34,7 @@ function AdminDashboard({ onLogout }) {
   const [masterOpen, setMasterOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const handleMasterMenu = (menu) => {
     setActivePage(menu);
@@ -223,16 +223,6 @@ function AdminDashboard({ onLogout }) {
 
         </nav>
 
-
-        {/* LOGOUT */}
-        <button
-          className="sidebar-logout"
-          onClick={onLogout}
-        >
-          <LogOut size={18} />
-          <span>Logout</span>
-        </button>
-
         {/* FOOTER SIDEBAR */}
         <img
          src="/assets/footer.png"
@@ -290,27 +280,54 @@ function AdminDashboard({ onLogout }) {
                 </button>
 
 
-                {/* PROFILE */}
-                <button
-                  className="admin-profile"
-                  type="button"
-                >
+                {/* PROFILE + DROPDOWN */}
+<div className="admin-profile-wrapper">
 
-                  <div className="profile-icon">
-                    A
-                  </div>
+  <button
+    className="admin-profile"
+    type="button"
+    onClick={() =>
+      setProfileOpen(!profileOpen)
+    }
+  >
 
-                  <div className="profile-info">
-                    <strong>Admin</strong>
-                    <span>Administrator</span>
-                  </div>
+    <div className="profile-icon">
+      A
+    </div>
 
-                  <ChevronDown
-                    size={16}
-                    className="profile-arrow"
-                  />
+    <div className="profile-info">
+      <strong>Admin</strong>
+      <span>Administrator</span>
+    </div>
 
-                </button>
+    <ChevronDown
+      size={16}
+      className={`profile-arrow ${
+        profileOpen ? "open" : ""
+      }`}
+    />
+
+  </button>
+
+  {profileOpen && (
+    <div className="admin-profile-dropdown">
+
+      <button
+        type="button"
+        className="profile-dropdown-item"
+        onClick={() => {
+          setProfileOpen(false);
+          onLogout();
+        }}
+      >
+        <LogOut size={17} />
+        <span>Logout</span>
+      </button>
+
+    </div>
+  )}
+
+</div>
 
               </div>
 

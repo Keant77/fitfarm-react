@@ -24,16 +24,31 @@
 /* FOOTER DEKORASI SIDEBAR */
 
 .sidebar-logo {
-  color: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 
-  font-size: 24px;
+  gap: 12px;
+
+  width: 100%;
+
+  margin-bottom: 32px;
+}
+
+.sidebar-logo-image {
+  width: 42px;
+  height: 42px;
+
+  object-fit: contain;
+
+  flex-shrink: 0;
+}
+
+.sidebar-logo span {
+  font-size: 21px;
   font-weight: 700;
-
-  text-align: center;
-
-  padding: 12px;
-
-  margin-bottom: 30px;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
 .sidebar-menu {
@@ -45,6 +60,8 @@
 .sidebar-item {
   width: 100%;
 
+  min-height: 48px;
+
   padding: 13px 16px;
 
   border: none;
@@ -54,11 +71,18 @@
 
   color: var(--surface);
 
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
   text-align: left;
 
   font-size: 14px;
 
   cursor: pointer;
+
+  box-sizing: border-box;
 }
 
 .sidebar-item:hover,
@@ -90,12 +114,24 @@
    MASTER DATA SIDEBAR DROPDOWN
    ================================= */
 
-.master-menu-toggle {
+  .master-menu-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   width: 100%;
+}
+
+  .master-menu-toggle .sidebar-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  flex: 1;
+}
+
+.master-menu-toggle > svg {
+  flex-shrink: 0;
 }
 
 .master-arrow {
@@ -277,7 +313,7 @@
   object-fit: cover;
   object-position: left bottom;
 
-  opacity: 0.28;
+  opacity: 1;
 
   z-index: 0;
 
