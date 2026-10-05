@@ -33,7 +33,7 @@ import {
 function AdminDashboard({ onLogout }) {
   const [masterOpen, setMasterOpen] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
 
   const handleMasterMenu = (menu) => {
@@ -84,9 +84,10 @@ function AdminDashboard({ onLogout }) {
       ===================================================== */}
 
       <aside
-        className={`admin-sidebar ${
-          sidebarOpen ? "mobile-open" : ""
-        }`}
+  className={`admin-sidebar ${
+    sidebarOpen ? "" : "sidebar-collapsed"
+  }`}
+
       >
 
         {/* MOBILE CLOSE */}
@@ -232,39 +233,31 @@ function AdminDashboard({ onLogout }) {
 
         </aside>
 
-      {/* =====================================================
-          MAIN CONTENT
-      ===================================================== */}
-
       <main className="admin-content">
 
-        {/* MOBILE MENU */}
-        <button
-          className="mobile-menu-button"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Buka menu"
-        >
-          <Menu size={22} />
-        </button>
+           {/* HEADER */}
+      <header className="admin-header">
 
+            <div className="admin-header-left">
 
-        {/* =====================================================
-            DASHBOARD
-        ===================================================== */}
+  <button
+    type="button"
+    className="header-menu-button"
+    onClick={() => setSidebarOpen(!sidebarOpen)}
+    aria-label="Buka atau tutup sidebar"
+  >
+    <Menu size={22} />
+  </button>
 
-        {activePage === "dashboard" && (
-          <>
+  <div className="admin-header-title">
+    <h2>DASHBOARD ADMIN</h2>
 
-            {/* HEADER */}
-            <header className="admin-header">
+    <p>
+      Selamat datang di sistem MaizeFit
+    </p>
+  </div>
 
-              <div className="admin-header-left">
-                <h2>DASHBOARD ADMIN</h2>
-
-                <p>
-                  Selamat datang di sistem MaizeFit
-                </p>
-              </div>
+</div>
 
 
               {/* HEADER RIGHT */}
@@ -333,6 +326,12 @@ function AdminDashboard({ onLogout }) {
 
             </header>
 
+        {/* =====================================================
+            DASHBOARD
+        ===================================================== */}
+
+        {activePage === "dashboard" && (
+          <>
 
             {/* =================================================
                 STAT CARDS

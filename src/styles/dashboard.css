@@ -32,11 +32,75 @@
 ===================================================== */
 
 .admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 26px;
+  min-height: 72px;
+  margin: -28px -34px 26px;
+  padding: 0 34px;
+
+  background: #ffffff;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.admin-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 1px;
+
+  background: #e5ebe8;
+}
+
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #000000;
+
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.header-menu-button:hover {
+  background: #f1f5f3;
+}
+
+.admin-header-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-header-title h2 {
+  margin: 0;
+}
+
+.admin-header-title p {
+  margin: 6px 0 0;
 }
 
 .admin-header-left h2 {
