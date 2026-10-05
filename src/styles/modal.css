@@ -155,3 +155,13 @@
   font-size: 16px;
   color: var(--text-primary);
 }
+
+.form-error {
+  display: block;
+  margin-top: 6px;
+
+  color: #dc2626 !important;
+
+  font-size: 13px;
+  line-height: 1.4;
+}

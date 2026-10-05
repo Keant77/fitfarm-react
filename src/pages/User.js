@@ -56,17 +56,99 @@ function User() {
     role_id: ""
   });
 
-  // ================================
-  // INPUT FORM
-  // ================================
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
+ // ================================
+// INPUT FORM
+// ================================
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData({
+    ...formData,
+    [name]: value
+  });
+
+  // Validasi real-time setelah field pernah disentuh
+  if (touched[name]) {
+    validateField(name, value);
+  }
+};
+
+  const validateField = (name, value) => {
+  let error = "";
+
+  if (name === "nama") {
+    if (!value.trim()) {
+      error = "Nama wajib diisi.";
+    } else if (value.trim().length < 3) {
+      error = "Nama minimal 3 karakter.";
+    }
+  }
+
+  if (name === "username") {
+    if (!value.trim()) {
+      error = "Username wajib diisi.";
+    } else if (value.trim().length < 3) {
+      error = "Username minimal 3 karakter.";
+    }
+  }
+
+  if (name === "password") {
+    if (editId === null && !value) {
+      error = "Password wajib diisi.";
+    } else if (value && value.length < 6) {
+      error = "Password minimal 6 karakter.";
+    }
+  }
+
+  if (name === "role_id") {
+    if (!value) {
+      error = "Role wajib dipilih.";
+    }
+  }
+
+  setErrors((prev) => ({
+    ...prev,
+    [name]: error
+  }));
+
+  return error;
+};
+
+const validateForm = () => {
+  const newErrors = {};
+
+  const namaError = validateField("nama", formData.nama);
+  const usernameError = validateField(
+    "username",
+    formData.username
+  );
+  const passwordError = validateField(
+    "password",
+    formData.password
+  );
+  const roleError = validateField(
+    "role_id",
+    formData.role_id
+  );
+
+  if (namaError) newErrors.nama = namaError;
+  if (usernameError) newErrors.username = usernameError;
+  if (passwordError) newErrors.password = passwordError;
+  if (roleError) newErrors.role_id = roleError;
+
+  setTouched({
+    nama: true,
+    username: true,
+    password: true,
+    role_id: true
+  });
+
+  return Object.keys(newErrors).length === 0;
+};
 
   // ================================
 // TAMBAH USER
@@ -80,6 +162,9 @@ const handleTambah = () => {
     password: "",
     role_id: ""
   });
+
+  setErrors({});
+  setTouched({});
 
   setShowForm(true);
 };
@@ -97,6 +182,9 @@ const handleEdit = (user) => {
     role_id: String(user.role_id)
   });
 
+  setErrors({});
+  setTouched({});
+
   setShowForm(true);
 };
 
@@ -106,12 +194,7 @@ const handleEdit = (user) => {
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (
-    !formData.nama ||
-    !formData.username ||
-    !formData.role_id
-  ) {
-    alert("Nama, username, dan role wajib diisi.");
+  if (!validateForm()) {
     return;
   }
 
@@ -429,11 +512,24 @@ const handleSubmit = async (e) => {
 
                 <input
                   type="text"
-                  name="nama"
+                 name="nama"
                   value={formData.nama}
                   onChange={handleChange}
+                 onBlur={() => {
+                   setTouched((prev) => ({
+                   ...prev,
+                   nama: true
+                 }));
+                   validateField("nama", formData.nama);
+                 }}
                   placeholder="Masukkan nama"
-                />
+/>
+
+{touched.nama && errors.nama && (
+  <span className="form-error">
+    {errors.nama}
+  </span>
+)}
               </div>
 
               {/* USERNAME */}
@@ -447,8 +543,22 @@ const handleSubmit = async (e) => {
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  placeholder="Masukkan username"
+                  onBlur={() => {
+                    setTouched((prev) => ({
+                   ...prev,
+                    username: true
+                }));
+                   validateField("username", formData.username);
+               }}
+                   placeholder="Masukkan username"
                 />
+
+                {touched.username && errors.username && (
+  <span className="form-error">
+    {errors.username}
+  </span>
+)}
+
               </div>
 
               {/* PASSWORD */}
@@ -462,12 +572,22 @@ const handleSubmit = async (e) => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder={
-                    editId !== null
-                      ? "Kosongkan jika tidak diubah"
-                      : "Masukkan password"
-                  }
-                />
+                  onBlur={() => {
+    setTouched((prev) => ({
+      ...prev,
+      password: true
+    }));
+    validateField("password", formData.password);
+  }}
+  placeholder="Masukkan password"
+/>
+
+{touched.password && errors.password && (
+  <span className="form-error">
+    {errors.password}
+  </span>
+)}
+
               </div>
 
               {/* ROLE ID */}
@@ -480,27 +600,42 @@ const handleSubmit = async (e) => {
                   name="role_id"
                   value={formData.role_id}
                   onChange={handleChange}
-                >
-                  <option value="">
-                    Pilih Role
-                  </option>
+                  onBlur={() => {
+    setTouched((prev) => ({
+      ...prev,
+      role_id: true
+    }));
 
-                  <option value="1">
-                    1 - Admin
-                  </option>
+    validateField("role_id", formData.role_id);
+  }}
+>
+  <option value="">Pilih Role</option>
 
-                  <option value="2">
-                    2 - Super Admin
-                  </option>
+  <option value="1">
+  1 - Admin
+</option>
 
-                  <option value="3">
-                    3 - Petugas Produksi
-                  </option>
+<option value="2">
+  2 - Super Admin
+</option>
 
-                  <option value="4">
-                    4 - Petugas Pengawas
-                  </option>
-                </select>
+<option value="3">
+  3 - Petugas Produksi
+</option>
+
+<option value="4">
+  4 - Petugas Pengawas
+</option>
+
+  {/* option role yang sudah ada */}
+</select>
+
+{touched.role_id && errors.role_id && (
+  <span className="form-error">
+    {errors.role_id}
+  </span>
+)}
+              
               </div>
 
               {/* BUTTON */}
