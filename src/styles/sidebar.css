@@ -349,3 +349,50 @@
 
   z-index: 2;
 }
+
+/* =========================================
+   DARK MODE SIDEBAR
+   ========================================= */
+
+body.dark .sidebar-item {
+  color: #ffffff;
+}
+
+body.dark .sidebar-item svg {
+  color: #ffffff;
+}
+
+body.dark .sidebar-item:hover,
+body.dark .sidebar-item.active {
+  color: #ffffff;
+}
+
+body.dark .sidebar-item:hover svg,
+body.dark .sidebar-item.active svg {
+  color: #ffffff;
+}
+
+body.dark .master-menu-toggle {
+  color: #ffffff;
+}
+
+body.dark .master-menu-toggle svg {
+  color: #ffffff;
+}
+
+body.dark .master-arrow {
+  color: #ffffff;
+}
+
+body.dark .master-submenu-item {
+  color: #ffffff;
+}
+
+body.dark .master-submenu-item svg {
+  color: #ffffff;
+}
+
+body.dark .master-submenu-item:hover,
+body.dark .master-submenu-item.active {
+  color: #ffffff;
+}

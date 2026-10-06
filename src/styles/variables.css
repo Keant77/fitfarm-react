@@ -29,3 +29,39 @@
   /* BASIC */
   --white: #FFFFFF;
 }
+
+/* =================================
+   DARK MODE VARIABLES
+   ================================= */
+
+body.dark {
+  /* PRIMARY */
+  --primary: #087C51;
+  --primary-dark: #064A2B;
+  --primary-light: #123C2C;
+
+  /* ACCENT */
+  --accent: #F4C430;
+  --accent-light: #3D3415;
+
+  /* BACKGROUND */
+  --background: #111827;
+  --surface: #1F2937;
+
+  /* TEXT */
+  --text-primary: #F9FAFB;
+  --text-secondary: #D1D5DB;
+  --text-hint: #9CA3AF;
+
+  /* BORDER */
+  --border: #374151;
+
+  /* STATUS */
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #F87171;
+  --error-background: #451A1A;
+
+  /* BASIC */
+  --white: #FFFFFF;
+}

@@ -1,5 +1,13 @@
 import { useState } from "react";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 import MapLahan from "../components/MapLahan";
 import MasterData from "./MasterData";
 import User from "./User";
@@ -7,6 +15,7 @@ import Role from "./Role";
 import Kecamatan from "./kecamatan";
 import Lahan from "./Lahan";
 import RiwayatPenilaian from "./RiwayatPenilaian";
+import { useTheme } from "../context/ThemeContext";
 
 import { Card, CardContent } from "../components/ui/card";
 
@@ -26,6 +35,7 @@ import {
   ShieldCheck,
   MapPinned,
   Menu,
+  Moon,
   X,
 } from "lucide-react";
 
@@ -35,6 +45,7 @@ function AdminDashboard({ onLogout }) {
   const [activePage, setActivePage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleMasterMenu = (menu) => {
     setActivePage(menu);
@@ -276,14 +287,18 @@ function AdminDashboard({ onLogout }) {
                 {/* PROFILE + DROPDOWN */}
 <div className="admin-profile-wrapper">
 
-  <button
-    className="admin-profile"
-    type="button"
-    onClick={() =>
-      setProfileOpen(!profileOpen)
+  <DropdownMenu
+  open={profileOpen}
+  onOpenChange={setProfileOpen}
+>
+  <DropdownMenuTrigger
+    render={
+      <button
+        className="admin-profile"
+        type="button"
+      />
     }
   >
-
     <div className="profile-icon">
       A
     </div>
@@ -299,26 +314,47 @@ function AdminDashboard({ onLogout }) {
         profileOpen ? "open" : ""
       }`}
     />
+  </DropdownMenuTrigger>
 
-  </button>
+  <DropdownMenuContent
+    align="end"
+    className="w-48"
+  >
 
-  {profileOpen && (
-    <div className="admin-profile-dropdown">
+    <DropdownMenuGroup>
 
-      <button
-        type="button"
-        className="profile-dropdown-item"
+      {/* TEMA */}
+      <DropdownMenuItem
+        onClick={toggleTheme}
+      >
+        <Moon size={16} />
+        <span>
+          Tema: {theme === "dark" ? "Dark" : "Light"}
+        </span>
+      </DropdownMenuItem>
+
+    </DropdownMenuGroup>
+
+    <DropdownMenuSeparator />
+
+    <DropdownMenuGroup>
+
+      {/* LOGOUT */}
+      <DropdownMenuItem
+        variant="destructive"
         onClick={() => {
           setProfileOpen(false);
           onLogout();
         }}
       >
-        <LogOut size={17} />
+        <LogOut size={16} />
         <span>Logout</span>
-      </button>
+      </DropdownMenuItem>
 
-    </div>
-  )}
+    </DropdownMenuGroup>
+
+  </DropdownMenuContent>
+</DropdownMenu>
 
 </div>
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ThemeProvider } from "./context/ThemeContext";
 import "./App.css";
 
 import Login from "./pages/Login";
@@ -27,37 +28,40 @@ function App() {
   };
 
   return (
-    <>
-      {/* LOGIN */}
-      {halaman === "login" && (
-        <Login
-          onLogin={handleLogin}
-          onRegister={() => alert("Halaman Register")}
-        />
-      )}
+    
+  <ThemeProvider>
 
-      {/* DASHBOARD ADMIN */}
-      {halaman === "dashboard" && (
-        <AdminDashboard
-          onLogout={handleLogout}
-        />
-      )}
+    {/* LOGIN */}
+    {halaman === "login" && (
+      <Login
+        onLogin={handleLogin}
+        onRegister={() => alert("Halaman Register")}
+      />
+    )}
 
-      {/* DATA INDIKATOR */}
-      {halaman === "indikator" && (
-        <Indikator
-          onBack={() => setHalaman("masterData")}
-        />
-      )}
+    {/* DASHBOARD ADMIN */}
+    {halaman === "dashboard" && (
+      <AdminDashboard
+        onLogout={handleLogout}
+      />
+    )}
 
-      {/* DATA ATURAN */}
-      {halaman === "aturan" && (
-        <Aturan
-          onBack={() => setHalaman("masterData")}
-        />
-      )}
-    </>
-  );
+    {/* DATA INDIKATOR */}
+    {halaman === "indikator" && (
+      <Indikator
+        onBack={() => setHalaman("masterData")}
+      />
+    )}
+
+    {/* DATA ATURAN */}
+    {halaman === "aturan" && (
+      <Aturan
+        onBack={() => setHalaman("masterData")}
+      />
+    )}
+
+  </ThemeProvider>
+);
 }
 
 export default App;
