@@ -15,9 +15,9 @@ import Role from "./Role";
 import Kecamatan from "./kecamatan";
 import Lahan from "./Lahan";
 import RiwayatPenilaian from "./RiwayatPenilaian";
-import { useTheme } from "../context/ThemeContext";
-
-import { Card, CardContent } from "../components/ui/card";
+import { useAdvancedTheme } from "../context/AdvancedThemeContext";
+import { useNotification } from "../context/NotificationContext";
+import { StatCard } from "../components/ui/stat-card";
 
 import {
   LayoutDashboard,
@@ -45,7 +45,24 @@ function AdminDashboard({ onLogout }) {
   const [activePage, setActivePage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const {
+  toggleTheme: toggleAdvancedTheme,
+    primaryColor,
+    secondaryColor,
+    setPrimaryColor,
+    setSecondaryColor,
+   resetTheme,
+  isDark: isAdvancedDark,
+} = useAdvancedTheme();
+
+const {
+  notifications,
+  markAsRead,
+  clearNotification,
+  clearAllNotifications,
+  unreadCount,
+} = useNotification();
 
   const handleMasterMenu = (menu) => {
     setActivePage(menu);
@@ -93,13 +110,12 @@ function AdminDashboard({ onLogout }) {
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
-
-      <aside
+      
+<aside
   className={`admin-sidebar ${
-    sidebarOpen ? "" : "sidebar-collapsed"
+    sidebarOpen ? "mobile-open" : "sidebar-collapsed"
   }`}
-
-      >
+>
 
         {/* MOBILE CLOSE */}
         <button
@@ -139,7 +155,6 @@ function AdminDashboard({ onLogout }) {
             <LayoutDashboard size={18} />
             <span>Dashboard</span>
           </button>
-
 
           {/* MASTER DATA */}
           <button
@@ -275,13 +290,75 @@ function AdminDashboard({ onLogout }) {
               <div className="admin-header-right">
 
                 {/* NOTIFICATION */}
-                <button
-                  className="notification-button"
-                  aria-label="Notifikasi"
-                >
-                  <Bell size={19} />
-                  <span className="notification-dot" />
-                </button>
+                <div className="notification-wrapper">
+  <button
+    type="button"
+    className="notification-button"
+    aria-label="Notifikasi"
+    onClick={() =>
+      setNotificationOpen(!notificationOpen)
+    }
+  >
+    <Bell size={19} />
+
+    {unreadCount > 0 && (
+      <span className="notification-badge">
+        {unreadCount}
+      </span>
+    )}
+  </button>
+
+  {notificationOpen && (
+    <div className="notification-dropdown">
+      <div className="notification-header">
+        <strong>Notifikasi</strong>
+
+        {notifications.length > 0 && (
+          <button
+            type="button"
+            onClick={clearAllNotifications}
+          >
+            Hapus semua
+          </button>
+        )}
+      </div>
+
+      <div className="notification-list">
+        {notifications.length === 0 ? (
+          <div className="notification-empty">
+            Belum ada notifikasi
+          </div>
+        ) : (
+          notifications.map((item) => (
+            <div
+              key={item.id}
+              className={`notification-item ${
+                item.read ? "read" : "unread"
+              }`}
+              onClick={() => markAsRead(item.id)}
+            >
+              <div className="notification-item-content">
+                <span>{item.message}</span>
+              </div>
+
+              <button
+                type="button"
+                className="notification-delete"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  clearNotification(item.id);
+                }}
+                aria-label="Hapus notifikasi"
+              >
+                ×
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )}
+</div>
 
 
                 {/* PROFILE + DROPDOWN */}
@@ -325,13 +402,50 @@ function AdminDashboard({ onLogout }) {
 
       {/* TEMA */}
       <DropdownMenuItem
-        onClick={toggleTheme}
+        onClick={toggleAdvancedTheme}
       >
         <Moon size={16} />
         <span>
-          Tema: {theme === "dark" ? "Dark" : "Light"}
+        Tema: {isAdvancedDark ? "Dark" : "Light"}
         </span>
       </DropdownMenuItem>
+
+      <DropdownMenuItem
+         onClick={resetTheme}
+      >
+        <span>↻</span>
+        <span>Reset Tema</span>
+      </DropdownMenuItem>
+
+      <div className="theme-color-section">
+  <span className="theme-color-title">
+    Warna Tema
+  </span>
+
+  <label className="theme-color-picker">
+    <span>Primary</span>
+
+    <input
+      type="color"
+      value={primaryColor}
+      onChange={(event) =>
+        setPrimaryColor(event.target.value)
+      }
+    />
+  </label>
+
+  <label className="theme-color-picker">
+    <span>Secondary</span>
+
+    <input
+      type="color"
+      value={secondaryColor}
+      onChange={(event) =>
+        setSecondaryColor(event.target.value)
+      }
+    />
+  </label>
+</div>
 
     </DropdownMenuGroup>
 
@@ -373,54 +487,19 @@ function AdminDashboard({ onLogout }) {
                 STAT CARDS
             ================================================= */}
 
-            <section className="dashboard-grid">
-
-              {dashboardStats.map((item) => {
-                const Icon = item.icon;
-
-                return (
-                  <Card
-                    key={item.title}
-                    className={`dashboard-card dashboard-card-${item.type}`}
-                  >
-
-                    <CardContent className="dashboard-card-content">
-
-                      {/* ICON */}
-                      <div className="dashboard-card-icon">
-                        <Icon size={24} strokeWidth={2} />
-                      </div>
-
-
-                      {/* INFO */}
-                      <div className="dashboard-card-info">
-
-                        <div className="dashboard-card-title">
-                          {item.title}
-                        </div>
-
-                        <div className="dashboard-number">
-                          {item.value}
-                        </div>
-
-                      </div>
-
-
-                      {/* SMALL ARROW */}
-                      <button
-                        className="dashboard-card-arrow"
-                        aria-label={`Detail ${item.title}`}
-                      >
-                        <ChevronRight size={14} />
-                      </button>
-
-                    </CardContent>
-
-                  </Card>
-                );
-              })}
-
-            </section>
+<section className="dashboard-grid">
+  {dashboardStats.map((item) => {
+    return (
+      <StatCard
+        key={item.title}
+        title={item.title}
+        value={item.value}
+        icon={item.icon}
+        type={item.type}
+      />
+    );
+  })}
+</section>
 
 
             {/* =================================================

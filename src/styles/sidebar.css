@@ -200,25 +200,69 @@
 .master-submenu-item span {
   font-size: 18px;
 }
-
 /* =========================================
-   MOBILE SIDEBAR
+   SIDEBAR MENU BUTTON
    ========================================= */
 
-.mobile-menu-button {
-  display: none;
+.header-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+
+  background: #FFFFFF;
+  color: #000000;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.mobile-sidebar-close {
-  display: none;
+.header-menu-button:hover {
+  background: #F3F4F6;
 }
 
+.header-menu-button svg {
+  color: #000000;
+}
 
 /* =========================================
    TABLET & MOBILE
    ========================================= */
 
 @media (max-width: 768px) {
+
+  .header-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+
+  background: #FFFFFF;
+  color: #000000;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.header-menu-button:hover {
+  background: #F3F4F6;
+}
+
+.header-menu-button svg {
+  color: #000000;
+}
 
   .admin-layout {
     position: relative;
@@ -279,28 +323,6 @@
     width: 100%;
     min-width: 0;
     margin-left: 0;
-  }
-
-  /* HAMBURGER */
-  .mobile-menu-button {
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    width: 44px;
-    height: 44px;
-
-    margin-bottom: 16px;
-
-    border: none;
-    border-radius: 8px;
-
-    background: #087443;
-    color: white;
-
-    font-size: 22px;
-    cursor: pointer;
   }
 }
 

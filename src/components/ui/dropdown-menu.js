@@ -20,28 +20,38 @@ export function DropdownMenu({
 
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
+  const rootRef = useRef(null);
 
-  const setOpen = (value) => {
-    if (!isControlled) {
-      setInternalOpen(value);
-    }
+ 
+const setOpen = (value) => {
+  const nextOpen =
+    typeof value === "function" ? value(open) : value;
 
-    if (onOpenChange) {
-      onOpenChange(value);
-    }
-  };
+  if (!isControlled) {
+    setInternalOpen(nextOpen);
+  }
+
+  if (onOpenChange) {
+    onOpenChange(nextOpen);
+  }
+};
+
 
   return (
-    <DropdownMenuContext.Provider
-      value={{
-        open,
-        setOpen,
-      }}
-    >
-      <div className="dropdown-menu-root">
-        {children}
-      </div>
-    </DropdownMenuContext.Provider>
+  <DropdownMenuContext.Provider
+  value={{
+    open,
+    setOpen,
+    rootRef,
+  }}
+>
+  <div
+    ref={rootRef}
+    className="dropdown-menu-root"
+  >
+    {children}
+  </div>
+</DropdownMenuContext.Provider>
   );
 }
 
@@ -62,7 +72,7 @@ export function DropdownMenuTrigger({
     }
 
     if (!event.defaultPrevented) {
-      setOpen(!open);
+     setOpen((previousOpen) => !previousOpen);
     }
   };
 
@@ -98,7 +108,7 @@ export function DropdownMenuContent({
   className = "",
   ...props
 }) {
-  const { open, setOpen } = useContext(DropdownMenuContext);
+  const { open, setOpen, rootRef } = useContext(DropdownMenuContext);
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -106,11 +116,11 @@ export function DropdownMenuContent({
 
     const handleOutsideClick = (event) => {
       if (
-        contentRef.current &&
-        !contentRef.current.contains(event.target)
-      ) {
-        setOpen(false);
-      }
+  rootRef.current &&
+  !rootRef.current.contains(event.target)
+) {
+  setOpen(false);
+}
     };
 
     const handleEscape = (event) => {
@@ -140,7 +150,7 @@ export function DropdownMenuContent({
         handleEscape
       );
     };
-  }, [open, setOpen]);
+  }, [open, setOpen, rootRef]);
 
   if (!open) {
     return null;

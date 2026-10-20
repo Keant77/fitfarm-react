@@ -1,27 +1,49 @@
+
 import * as React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "./card";
+import { Card, CardContent } from "./card";
 
-const StatCard = React.forwardRef(
-  ({ title, value, className = "" }, ref) => {
-    return (
-      <Card
-        ref={ref}
-        className={`rounded-2xl border-[#E5E7EB] bg-white shadow-sm transition-shadow hover:shadow-md ${className}`}
-      >
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-[#6B7280]">
-            {title}
-          </CardTitle>
-        </CardHeader>
+const StatCard = React.memo(
+  React.forwardRef(
+    (
+      {
+        title,
+        value,
+        icon: Icon,
+        type = "green",
+        className = "",
+        onDetail,
+      },
+      ref
+    ) => {
+        
+      return (
+        <Card
+          ref={ref}
+          className={`dashboard-card dashboard-card-${type} ${className}`}
+        >
+          <CardContent className="dashboard-card-content">
+            <div className="dashboard-card-icon">
+              {Icon && <Icon size={24} strokeWidth={2} />}
+            </div>
 
-        <CardContent>
-          <div className="text-3xl font-bold text-[#0F6D3A]">
-            {value}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+            <div className="dashboard-card-info">
+              <div className="dashboard-card-title">{title}</div>
+              <div className="dashboard-number">{value}</div>
+            </div>
+
+            <button
+              type="button"
+              className="dashboard-card-arrow"
+              aria-label={`Detail ${title}`}
+              onClick={onDetail}
+            >
+              <span aria-hidden="true">›</span>
+            </button>
+          </CardContent>
+        </Card>
+      );
+    }
+  )
 );
 
 StatCard.displayName = "StatCard";
