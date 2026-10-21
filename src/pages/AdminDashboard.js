@@ -31,8 +31,6 @@ import {
   ChevronDown,
   ChevronRight,
   LogOut,
-  UserRound,
-  ShieldCheck,
   MapPinned,
   Menu,
   Moon,
@@ -42,7 +40,11 @@ import {
 
 function AdminDashboard({ onLogout }) {
   const [masterOpen, setMasterOpen] = useState(true);
-  const [activePage, setActivePage] = useState("dashboard");
+  const [activePage, setActivePage] = useState(() => {
+    const savedPage = localStorage.getItem("maizefit_halaman");
+    const validPages = ["dashboard", "master", "user", "role", "kecamatan", "lahan", "riwayat"];
+    return validPages.includes(savedPage) ? savedPage : "dashboard";
+  });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -64,10 +66,21 @@ const {
   unreadCount,
 } = useNotification();
 
-  const handleMasterMenu = (menu) => {
-    setActivePage(menu);
-    setSidebarOpen(false);
+ const handlePageChange = (page) => {
+  setActivePage(page);
+  localStorage.setItem("maizefit_halaman", page);
+};
+
+  const pageHeaders = {
+    dashboard: { title: "DASHBOARD ADMIN", subtitle: "Ringkasan data dan aktivitas sistem MaizeFit" },
+    master: { title: "MASTER DATA", subtitle: "Pengelolaan data sistem MaizeFit" },
+    user: { title: "PENGGUNA", subtitle: "Kelola data pengguna yang terdaftar di MaizeFit" },
+    role: { title: "ROLE", subtitle: "Kelola peran dan hak akses pengguna" },
+    kecamatan: { title: "KECAMATAN", subtitle: "Kelola data kecamatan pada sistem MaizeFit" },
+    lahan: { title: "LAHAN", subtitle: "Kelola data lahan yang dinilai dalam MaizeFit" },
+    riwayat: { title: "RIWAYAT PENILAIAN", subtitle: "Lihat riwayat penilaian kelayakan lahan" },
   };
+  const currentHeader = pageHeaders[activePage] || pageHeaders.dashboard;
 
 
   const dashboardStats = [
@@ -147,10 +160,7 @@ const {
             className={`sidebar-item ${
               activePage === "dashboard" ? "active" : ""
             }`}
-            onClick={() => {
-              setActivePage("dashboard");
-              setSidebarOpen(false);
-            }}
+            onClick={() => handlePageChange("dashboard")}
           >
             <LayoutDashboard size={18} />
             <span>Dashboard</span>
@@ -184,13 +194,11 @@ const {
             <div className="master-submenu">
 
               <button
-                className={`master-submenu-item ${
-                  activePage === "user" ? "active" : ""
-                }`}
-                onClick={() => handleMasterMenu("user")}
+                type="button"
+                className={`master-submenu-item ${activePage === "user" ? "active" : ""}`}
+                onClick={() => handlePageChange("user")}
               >
                 <span className="submenu-line">−</span>
-                <UserRound size={15} />
                 <span>Pengguna</span>
               </button>
 
@@ -199,10 +207,9 @@ const {
                 className={`master-submenu-item ${
                   activePage === "role" ? "active" : ""
                 }`}
-                onClick={() => handleMasterMenu("role")}
+                onClick={() => handlePageChange("role")}
               >
                 <span className="submenu-line">−</span>
-                <ShieldCheck size={15} />
                 <span>Role</span>
               </button>
 
@@ -211,10 +218,9 @@ const {
                 className={`master-submenu-item ${
                   activePage === "kecamatan" ? "active" : ""
                 }`}
-                onClick={() => handleMasterMenu("kecamatan")}
+                onClick={() => handlePageChange("kecamatan")}
               >
                 <span className="submenu-line">−</span>
-                <MapPinned size={15} />
                 <span>Kecamatan</span>
               </button>
 
@@ -223,10 +229,9 @@ const {
                 className={`master-submenu-item ${
                   activePage === "lahan" ? "active" : ""
                 }`}
-                onClick={() => handleMasterMenu("lahan")}
+                onClick={() => handlePageChange("lahan")}
               >
                 <span className="submenu-line">−</span>
-                <MapPinned size={15} />
                 <span>Lahan</span>
               </button>
 
@@ -239,10 +244,7 @@ const {
             className={`sidebar-item ${
               activePage === "riwayat" ? "active" : ""
             }`}
-            onClick={() => {
-              setActivePage("riwayat");
-              setSidebarOpen(false);
-            }}
+            onClick={() => handlePageChange("riwayat")}
           >
             <History size={18} />
             <span>Riwayat Penilaian</span>
@@ -276,10 +278,10 @@ const {
   </button>
 
   <div className="admin-header-title">
-    <h2>DASHBOARD ADMIN</h2>
+    <h2>{currentHeader.title}</h2>
 
     <p>
-      Selamat datang di sistem MaizeFit
+      {currentHeader.subtitle}
     </p>
   </div>
 

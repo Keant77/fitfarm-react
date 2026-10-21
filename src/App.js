@@ -7,15 +7,22 @@ import "./App.css";
 
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
-import Indikator from "./pages/Indikator";
-import Aturan from "./pages/Aturan";
 
 function App() {
-  const [halaman, setHalaman] = useState(() => {
-    const sudahLogin = localStorage.getItem("maizefit_logged_in");
+  
+const [halaman, setHalaman] = useState(() => {
+  const sudahLogin = localStorage.getItem("maizefit_logged_in");
 
-    return sudahLogin === "true" ? "dashboard" : "login";
-  });
+  if (sudahLogin !== "true") {
+    return "login";
+  }
+
+  // Semua halaman setelah login ditangani di dalam AdminDashboard.
+  // Nilai halaman lama seperti "indikator" atau "aturan" kembali ke dashboard,
+  // sedangkan AdminDashboard memulihkan halaman internal yang valid.
+  return "dashboard";
+});
+
 
   const handleLogin = (username, password) => {
     // LOGIN SEMENTARA
@@ -32,6 +39,7 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("maizefit_logged_in");
+    localStorage.removeItem("maizefit_halaman");
     setHalaman("login");
   };
 
@@ -52,19 +60,6 @@ function App() {
             <AdminDashboard onLogout={handleLogout} />
           )}
 
-          {/* DATA INDIKATOR */}
-          {halaman === "indikator" && (
-            <Indikator
-              onBack={() => setHalaman("masterData")}
-            />
-          )}
-
-          {/* DATA ATURAN */}
-          {halaman === "aturan" && (
-            <Aturan
-              onBack={() => setHalaman("masterData")}
-            />
-          )}
         </NotificationProvider>
       </AdvancedThemeProvider>
     </ThemeProvider>
