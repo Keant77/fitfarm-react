@@ -3,55 +3,113 @@ import React, {
   useState,
   useContext,
   useEffect,
+  useMemo,
+  useCallback,
 } from "react";
 
-// 1. Membuat Context
 const ThemeContext = createContext();
 
-// 2. Membuat Provider
+const THEME_DEFAULTS = {
+  primary: "#0F6D3A",
+  secondary: "#F4C430",
+};
+
 export const ThemeProvider = ({ children }) => {
-  const getInitialTheme = () => {
+  const [theme, setThemeState] = useState(() => {
     try {
-      const savedTheme = localStorage.getItem("app-theme");
-      return savedTheme ? savedTheme : "light";
-    } catch (error) {
+      return localStorage.getItem("app-theme") || "light";
+    } catch {
       return "light";
     }
-  };
+  });
 
-  const [theme, setTheme] = useState(getInitialTheme);
+  const [primaryColor, setPrimaryColorState] = useState(() => {
+    try {
+      return localStorage.getItem("app-primary-color") || THEME_DEFAULTS.primary;
+    } catch {
+      return THEME_DEFAULTS.primary;
+    }
+  });
 
-  // Mengubah theme
-  const toggleTheme = () => {
-    setTheme((prevTheme) =>
-      prevTheme === "light" ? "dark" : "light"
-    );
-  };
+  const [secondaryColor, setSecondaryColorState] = useState(() => {
+    try {
+      return localStorage.getItem("app-secondary-color") || THEME_DEFAULTS.secondary;
+    } catch {
+      return THEME_DEFAULTS.secondary;
+    }
+  });
 
-  // Mengubah theme secara langsung
-  const setThemeDirect = (newTheme) => {
-    setTheme(newTheme);
-  };
+  const toggleTheme = useCallback(() => {
+    setThemeState((prev) => (prev === "light" ? "dark" : "light"));
+  }, []);
 
-  // Menyimpan theme
+  const setTheme = useCallback((newTheme) => {
+    setThemeState(newTheme);
+  }, []);
+
+  const setPrimaryColor = useCallback((color) => {
+    setPrimaryColorState(color);
+    try {
+      localStorage.setItem("app-primary-color", color);
+    } catch {}
+  }, []);
+
+  const setSecondaryColor = useCallback((color) => {
+    setSecondaryColorState(color);
+    try {
+      localStorage.setItem("app-secondary-color", color);
+    } catch {}
+  }, []);
+
+  const resetTheme = useCallback(() => {
+    setThemeState("light");
+    setPrimaryColorState(THEME_DEFAULTS.primary);
+    setSecondaryColorState(THEME_DEFAULTS.secondary);
+    try {
+      localStorage.removeItem("app-primary-color");
+      localStorage.removeItem("app-secondary-color");
+      localStorage.setItem("app-theme", "light");
+    } catch {}
+  }, []);
+
   useEffect(() => {
     try {
       localStorage.setItem("app-theme", theme);
-    } catch (error) {
-      console.error("Gagal menyimpan theme:", error);
-    }
+    } catch {}
 
     document.body.className = theme;
-  }, [theme]);
+    document.documentElement.style.setProperty("--primary", primaryColor);
+    document.documentElement.style.setProperty("--accent", secondaryColor);
+  }, [theme, primaryColor, secondaryColor]);
 
-  // Data yang dibagikan melalui Context
-  const contextValue = {
-    theme,
-    toggleTheme,
-    setTheme: setThemeDirect,
-    isDark: theme === "dark",
-    isLight: theme === "light",
-  };
+  const isDark = theme === "dark";
+
+  const contextValue = useMemo(
+    () => ({
+      theme,
+      mode: theme,
+      isDark,
+      isLight: !isDark,
+      toggleTheme,
+      setTheme,
+      primaryColor,
+      secondaryColor,
+      setPrimaryColor,
+      setSecondaryColor,
+      resetTheme,
+    }),
+    [
+      theme,
+      isDark,
+      toggleTheme,
+      setTheme,
+      primaryColor,
+      secondaryColor,
+      setPrimaryColor,
+      setSecondaryColor,
+      resetTheme,
+    ]
+  );
 
   return (
     <ThemeContext.Provider value={contextValue}>
@@ -60,17 +118,15 @@ export const ThemeProvider = ({ children }) => {
   );
 };
 
-// 3. Custom Hook untuk menggunakan Context
 export const useTheme = () => {
   const context = useContext(ThemeContext);
-
   if (!context) {
-    throw new Error(
-      "useTheme harus digunakan di dalam ThemeProvider"
-    );
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
-
   return context;
 };
+
+// Alias untuk kompatibilitas
+export const useAdvancedTheme = useTheme;
 
 export default ThemeContext;

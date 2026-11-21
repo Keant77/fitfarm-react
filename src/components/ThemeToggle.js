@@ -2,11 +2,7 @@ import React from "react";
 import { useTheme } from "../context/ThemeContext";
 
 function ThemeToggle() {
-  const {
-    theme,
-    toggleTheme,
-    isDark,
-  } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
 
   return (
     <button
@@ -14,14 +10,19 @@ function ThemeToggle() {
       onClick={toggleTheme}
       style={{
         padding: "8px 14px",
-        border: "1px solid #d1d5db",
+        border: "1px solid var(--border)",
         borderRadius: "8px",
-        background: isDark ? "#1f2937" : "#ffffff",
-        color: isDark ? "#ffffff" : "#111827",
+        background: "var(--surface)",
+        color: "var(--text-primary)",
         cursor: "pointer",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
       }}
+      aria-label="Toggle Theme"
     >
-      {isDark ? "☀️ Light" : "🌙 Dark"}
+      <span>{isDark ? "☀️" : "🌙"}</span>
+      <span>{isDark ? "Light" : "Dark"}</span>
     </button>
   );
 }
