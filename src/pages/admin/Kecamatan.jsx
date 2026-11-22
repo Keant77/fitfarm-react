@@ -7,43 +7,42 @@ import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 export function Kecamatan() {
   const { showToast } = useNotification();
-  const [dataKecamatan, setDataKecamatan] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
-
   const [formData, setFormData] = useState({ nama: "" });
 
   useEffect(() => {
     kecamatanService
       .getAll()
-      .then((data) => setDataKecamatan(data))
-      .catch((error) => {
-        console.error("Gagal mengambil data kecamatan:", error);
-        showToast("Gagal mengambil data kecamatan", "error");
-      })
+      .then(setData)
+      .catch(() => showToast("Gagal mengambil data kecamatan", "error"))
       .finally(() => setLoading(false));
   }, [showToast]);
 
-  const filteredDataKecamatan = dataKecamatan.filter(
-    (kecamatan) =>
-      kecamatan.nama.toLowerCase().includes(search.toLowerCase()) ||
-      String(kecamatan.id).includes(search)
+  const filtered = data.filter(
+    (k) =>
+      k.nama.toLowerCase().includes(search.toLowerCase()) ||
+      String(k.id).includes(search),
   );
 
-  const handleTambah = () => {
+  const openCreate = () => {
     setEditId(null);
     setFormData({ nama: "" });
     setShowForm(true);
   };
-
-  const handleEdit = (kecamatan) => {
-    setEditId(kecamatan.id);
-    setFormData({ nama: kecamatan.nama });
+  const openEdit = (k) => {
+    setEditId(k.id);
+    setFormData({ nama: k.nama });
     setShowForm(true);
+  };
+  const closeForm = () => {
+    setShowForm(false);
+    setFormData({ nama: "" });
+    setEditId(null);
   };
 
   const handleSubmit = async (e) => {
@@ -53,46 +52,33 @@ export function Kecamatan() {
       return;
     }
 
-    if (editId !== null) {
-      const updatedKecamatan = { id: editId, nama: formData.nama };
-      try {
-        await kecamatanService.update(editId, updatedKecamatan);
-        setDataKecamatan(
-          dataKecamatan.map((k) => (k.id === editId ? updatedKecamatan : k))
-        );
+    try {
+      if (editId !== null) {
+        const updated = { id: editId, nama: formData.nama };
+        await kecamatanService.update(editId, updated);
+        setData((prev) => prev.map((k) => (k.id === editId ? updated : k)));
         showToast("Kecamatan berhasil diubah!", "success");
-      } catch (error) {
-        showToast("Gagal mengubah kecamatan.", "error");
-        return;
+      } else {
+        const created = await kecamatanService.create({ nama: formData.nama });
+        setData((prev) => [...prev, created]);
+        showToast("Kecamatan berhasil ditambahkan!", "success");
       }
-    } else {
-      const newKecamatan = { nama: formData.nama };
-      try {
-        const data = await kecamatanService.create(newKecamatan);
-        const kecamatanBaru = {
-          id: data.id || Date.now(),
-          nama: data.nama || newKecamatan.nama,
-        };
-        setDataKecamatan([...dataKecamatan, kecamatanBaru]);
-        showToast("Kecamatan baru berhasil ditambahkan!", "success");
-      } catch (error) {
-        showToast("Gagal menambahkan kecamatan.", "error");
-        return;
-      }
+      closeForm();
+    } catch {
+      showToast("Gagal menyimpan kecamatan.", "error");
     }
-
-    setShowForm(false);
-    setFormData({ nama: "" });
-    setEditId(null);
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
       await kecamatanService.delete(deleteTarget.id);
-      setDataKecamatan(dataKecamatan.filter((item) => item.id !== deleteTarget.id));
-      showToast(`Kecamatan "${deleteTarget.nama}" berhasil dihapus!`, "success");
-    } catch (error) {
+      setData((prev) => prev.filter((k) => k.id !== deleteTarget.id));
+      showToast(
+        `Kecamatan "${deleteTarget.nama}" berhasil dihapus!`,
+        "success",
+      );
+    } catch {
       showToast("Gagal menghapus kecamatan.", "error");
     } finally {
       setDeleteTarget(null);
@@ -101,66 +87,58 @@ export function Kecamatan() {
 
   return (
     <div className="data-page">
-      <div className="data-page-header">
-        <div>
-          <h1>DATA KECAMATAN</h1>
-          <p>Kelola data wilayah kecamatan penilaian lahan di Kabupaten Jember</p>
-        </div>
-      </div>
-
       <div className="data-table-card">
-        <div className="data-table-header">
-          <h2>Daftar Kecamatan</h2>
-        </div>
-
         <div className="data-toolbar">
-          <Button className="data-add-button" onClick={handleTambah}>
-            ＋ Tambah Kecamatan
-          </Button>
-
-          <Input
-            type="text"
-            className="data-search"
-            placeholder="Cari kecamatan..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <span className="data-toolbar-title">Data Kecamatan</span>
+          <div className="data-toolbar-right">
+            <Input
+              className="data-search"
+              placeholder="Cari kecamatan..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Button className="data-add-button" onClick={openCreate}>
+              + Tambah
+            </Button>
+          </div>
         </div>
 
         <div className="data-table-wrapper">
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ width: "80px" }}>ID</th>
+                <th style={{ width: 56 }}>ID</th>
                 <th>Nama Kecamatan</th>
-                <th style={{ width: "160px" }}>Aksi</th>
+                <th style={{ width: 140 }}>Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="3" style={{ textAlign: "center", padding: "30px" }}>
-                    Memuat data kecamatan...
+                  <td colSpan="3" className="data-empty">
+                    Memuat data...
                   </td>
                 </tr>
-              ) : filteredDataKecamatan.length > 0 ? (
-                filteredDataKecamatan.map((kecamatan) => (
-                  <tr key={kecamatan.id}>
-                    <td>{kecamatan.id}</td>
-                    <td><strong>{kecamatan.nama}</strong></td>
+              ) : filtered.length > 0 ? (
+                filtered.map((kec) => (
+                  <tr key={kec.id}>
+                    <td>{kec.id}</td>
+                    <td>
+                      <strong>{kec.nama}</strong>
+                    </td>
                     <td>
                       <div className="data-action">
                         <Button
                           variant="warning"
                           size="sm"
-                          onClick={() => handleEdit(kecamatan)}
+                          onClick={() => openEdit(kec)}
                         >
                           Edit
                         </Button>
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => setDeleteTarget(kecamatan)}
+                          onClick={() => setDeleteTarget(kec)}
                         >
                           Hapus
                         </Button>
@@ -170,7 +148,7 @@ export function Kecamatan() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" style={{ textAlign: "center", padding: "30px" }}>
+                  <td colSpan="3" className="data-empty">
                     Tidak ada data kecamatan.
                   </td>
                 </tr>
@@ -184,12 +162,8 @@ export function Kecamatan() {
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h3>{editId !== null ? "Edit Kecamatan" : "Tambah Kecamatan Baru"}</h3>
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setShowForm(false)}
-              >
+              <h3>{editId !== null ? "Edit Kecamatan" : "Tambah Kecamatan"}</h3>
+              <button type="button" className="modal-close" onClick={closeForm}>
                 ✕
               </button>
             </div>
@@ -197,24 +171,18 @@ export function Kecamatan() {
               <div className="modal-field">
                 <label>Nama Kecamatan</label>
                 <Input
-                  type="text"
-                  placeholder="Contoh: Sumbersari, Kaliwates, Patrang"
+                  placeholder="Contoh: Sumbersari, Kaliwates"
                   value={formData.nama}
                   onChange={(e) => setFormData({ nama: e.target.value })}
                   required
                 />
               </div>
-
               <div className="modal-actions">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowForm(false)}
-                >
+                <Button type="button" variant="outline" onClick={closeForm}>
                   Batal
                 </Button>
                 <Button type="submit">
-                  {editId !== null ? "Simpan Perubahan" : "Tambah Kecamatan"}
+                  {editId !== null ? "Simpan" : "Tambah"}
                 </Button>
               </div>
             </form>
@@ -225,8 +193,8 @@ export function Kecamatan() {
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Hapus Kecamatan"
-        message={`Apakah Anda yakin ingin menghapus kecamatan "${deleteTarget?.nama}"?`}
-        confirmText="Hapus Kecamatan"
+        message={`Hapus kecamatan "${deleteTarget?.nama}"?`}
+        confirmText="Hapus"
         onConfirm={confirmDelete}
         onClose={() => setDeleteTarget(null)}
       />

@@ -123,7 +123,6 @@
   background: var(--primary-dark);
 }
 
-
 /* =====================================================
    DETAIL RIWAYAT PENILAIAN
    ===================================================== */
@@ -249,6 +248,36 @@
   border-top: 1px solid var(--border);
 }
 
+/* Select di dalam modal */
+.modal-select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 13.5px;
+  outline: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+  box-sizing: border-box;
+  appearance: auto;
+}
+
+.modal-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 109, 58, 0.08);
+}
+
+body.dark .modal-select {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
 /* =====================================================
    TOAST NOTIFICATION STACK
    ===================================================== */
@@ -329,8 +358,12 @@
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modalSlideUp {

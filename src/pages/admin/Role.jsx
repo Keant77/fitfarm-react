@@ -9,41 +9,40 @@ export function Role() {
   const { showToast } = useNotification();
   const [dataRole, setDataRole] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
-
   const [formData, setFormData] = useState({ name: "" });
 
   useEffect(() => {
     roleService
       .getAll()
-      .then((data) => setDataRole(data))
-      .catch((error) => {
-        console.error("Gagal mengambil data role:", error);
-        showToast("Gagal mengambil data role", "error");
-      })
+      .then(setDataRole)
+      .catch(() => showToast("Gagal mengambil data role", "error"))
       .finally(() => setLoading(false));
   }, [showToast]);
 
-  const filteredDataRole = dataRole.filter(
-    (role) =>
-      role.name.toLowerCase().includes(search.toLowerCase()) ||
-      String(role.id).includes(search)
+  const filtered = dataRole.filter(
+    (r) =>
+      r.name.toLowerCase().includes(search.toLowerCase()) ||
+      String(r.id).includes(search),
   );
 
-  const handleTambah = () => {
+  const openCreate = () => {
     setEditId(null);
     setFormData({ name: "" });
     setShowForm(true);
   };
-
-  const handleEdit = (role) => {
-    setEditId(role.id);
-    setFormData({ name: role.name });
+  const openEdit = (r) => {
+    setEditId(r.id);
+    setFormData({ name: r.name });
     setShowForm(true);
+  };
+  const closeForm = () => {
+    setShowForm(false);
+    setFormData({ name: "" });
+    setEditId(null);
   };
 
   const handleSubmit = async (e) => {
@@ -53,46 +52,30 @@ export function Role() {
       return;
     }
 
-    if (editId !== null) {
-      const updatedRole = { id: editId, name: formData.name };
-      try {
-        await roleService.update(editId, updatedRole);
-        setDataRole(
-          dataRole.map((role) => (role.id === editId ? updatedRole : role))
-        );
+    try {
+      if (editId !== null) {
+        const updated = { id: editId, name: formData.name };
+        await roleService.update(editId, updated);
+        setDataRole((prev) => prev.map((r) => (r.id === editId ? updated : r)));
         showToast("Role berhasil diubah!", "success");
-      } catch (error) {
-        showToast("Gagal mengubah role.", "error");
-        return;
-      }
-    } else {
-      const newRole = { name: formData.name };
-      try {
-        const data = await roleService.create(newRole);
-        const roleBaru = {
-          id: data.id || Date.now(),
-          name: data.name || newRole.name,
-        };
-        setDataRole([...dataRole, roleBaru]);
+      } else {
+        const created = await roleService.create({ name: formData.name });
+        setDataRole((prev) => [...prev, created]);
         showToast("Role baru berhasil ditambahkan!", "success");
-      } catch (error) {
-        showToast("Gagal menambahkan role.", "error");
-        return;
       }
+      closeForm();
+    } catch {
+      showToast("Gagal menyimpan role.", "error");
     }
-
-    setShowForm(false);
-    setFormData({ name: "" });
-    setEditId(null);
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
       await roleService.delete(deleteTarget.id);
-      setDataRole(dataRole.filter((item) => item.id !== deleteTarget.id));
+      setDataRole((prev) => prev.filter((r) => r.id !== deleteTarget.id));
       showToast(`Role "${deleteTarget.name}" berhasil dihapus!`, "success");
-    } catch (error) {
+    } catch {
       showToast("Gagal menghapus role.", "error");
     } finally {
       setDeleteTarget(null);
@@ -101,59 +84,51 @@ export function Role() {
 
   return (
     <div className="data-page">
-      <div className="data-page-header">
-        <div>
-          <h1>DATA ROLE</h1>
-          <p>Kelola peran dan hak akses pengguna sistem MaizeFit</p>
-        </div>
-      </div>
-
       <div className="data-table-card">
-        <div className="data-table-header">
-          <h2>Daftar Role</h2>
-        </div>
-
         <div className="data-toolbar">
-          <Button className="data-add-button" onClick={handleTambah}>
-            ＋ Tambah Role
-          </Button>
-
-          <Input
-            type="text"
-            className="data-search"
-            placeholder="Cari role..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <span className="data-toolbar-title">Data Role</span>
+          <div className="data-toolbar-right">
+            <Input
+              className="data-search"
+              placeholder="Cari role..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Button className="data-add-button" onClick={openCreate}>
+              + Tambah
+            </Button>
+          </div>
         </div>
 
         <div className="data-table-wrapper">
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ width: "80px" }}>ID</th>
+                <th style={{ width: 56 }}>ID</th>
                 <th>Nama Role</th>
-                <th style={{ width: "160px" }}>Aksi</th>
+                <th style={{ width: 140 }}>Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="3" style={{ textAlign: "center", padding: "30px" }}>
-                    Memuat data role...
+                  <td colSpan="3" className="data-empty">
+                    Memuat data...
                   </td>
                 </tr>
-              ) : filteredDataRole.length > 0 ? (
-                filteredDataRole.map((role) => (
+              ) : filtered.length > 0 ? (
+                filtered.map((role) => (
                   <tr key={role.id}>
                     <td>{role.id}</td>
-                    <td><strong>{role.name}</strong></td>
+                    <td>
+                      <strong>{role.name}</strong>
+                    </td>
                     <td>
                       <div className="data-action">
                         <Button
                           variant="warning"
                           size="sm"
-                          onClick={() => handleEdit(role)}
+                          onClick={() => openEdit(role)}
                         >
                           Edit
                         </Button>
@@ -170,7 +145,7 @@ export function Role() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" style={{ textAlign: "center", padding: "30px" }}>
+                  <td colSpan="3" className="data-empty">
                     Tidak ada data role.
                   </td>
                 </tr>
@@ -184,12 +159,8 @@ export function Role() {
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h3>{editId !== null ? "Edit Role" : "Tambah Role Baru"}</h3>
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setShowForm(false)}
-              >
+              <h3>{editId !== null ? "Edit Role" : "Tambah Role"}</h3>
+              <button type="button" className="modal-close" onClick={closeForm}>
                 ✕
               </button>
             </div>
@@ -197,24 +168,18 @@ export function Role() {
               <div className="modal-field">
                 <label>Nama Role</label>
                 <Input
-                  type="text"
                   placeholder="Contoh: Administrator, Petugas Lapangan"
                   value={formData.name}
                   onChange={(e) => setFormData({ name: e.target.value })}
                   required
                 />
               </div>
-
               <div className="modal-actions">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowForm(false)}
-                >
+                <Button type="button" variant="outline" onClick={closeForm}>
                   Batal
                 </Button>
                 <Button type="submit">
-                  {editId !== null ? "Simpan Perubahan" : "Tambah Role"}
+                  {editId !== null ? "Simpan" : "Tambah"}
                 </Button>
               </div>
             </form>
@@ -225,8 +190,8 @@ export function Role() {
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Hapus Role"
-        message={`Apakah Anda yakin ingin menghapus role "${deleteTarget?.name}"?`}
-        confirmText="Hapus Role"
+        message={`Hapus role "${deleteTarget?.name}"?`}
+        confirmText="Hapus"
         onConfirm={confirmDelete}
         onClose={() => setDeleteTarget(null)}
       />

@@ -4,46 +4,53 @@ import { Input } from "../../components/ui/input";
 import { riwayatService } from "../../services/api";
 import { useNotification } from "../../context/NotificationContext";
 
+const EMPTY_FORM = {
+  lahan: "",
+  tanggal: "",
+  skor_kelayakan: "",
+  probabilitas: "",
+};
+
+function skorClass(skor) {
+  if (skor >= 0.75) return "skor-tinggi";
+  if (skor >= 0.5) return "skor-sedang";
+  return "skor-rendah";
+}
+
+function probBadgeClass(prob) {
+  if (prob >= 75) return "badge badge-green";
+  if (prob >= 50) return "badge badge-yellow";
+  return "badge badge-red";
+}
+
 export function RiwayatPenilaian() {
   const { showToast } = useNotification();
-  const [dataRiwayat, setDataRiwayat] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedData, setSelectedData] = useState(null);
   const [showForm, setShowForm] = useState(false);
-
-  const [formData, setFormData] = useState({
-    lahan: "",
-    tanggal: "",
-    skor_kelayakan: "",
-    probabilitas: "",
-  });
+  const [formData, setFormData] = useState(EMPTY_FORM);
 
   useEffect(() => {
     riwayatService
       .getAll()
-      .then((data) => setDataRiwayat(data))
-      .catch((error) => {
-        console.error("Gagal mengambil data riwayat:", error);
-        showToast("Gagal mengambil data riwayat", "error");
-      })
+      .then(setData)
+      .catch(() => showToast("Gagal mengambil data riwayat", "error"))
       .finally(() => setLoading(false));
   }, [showToast]);
 
-  const dataFiltered = dataRiwayat.filter((item) =>
-    item.lahan.toLowerCase().includes(search.toLowerCase())
+  const filtered = data.filter((item) =>
+    item.lahan.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) =>
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleTambah = () => {
+  const openCreate = () => {
     setFormData({
-      lahan: "",
+      ...EMPTY_FORM,
       tanggal: new Date().toISOString().slice(0, 10),
-      skor_kelayakan: "",
-      probabilitas: "",
     });
     setShowForm(true);
   };
@@ -52,40 +59,25 @@ export function RiwayatPenilaian() {
     e.preventDefault();
     if (
       !formData.lahan.trim() ||
-      !formData.tanggal.trim() ||
+      !formData.tanggal ||
       !formData.skor_kelayakan ||
       !formData.probabilitas
     ) {
-      showToast("Semua data riwayat wajib diisi.", "warning");
+      showToast("Semua field wajib diisi.", "warning");
       return;
     }
 
-    const newRiwayat = {
-      lahan: formData.lahan,
-      tanggal: formData.tanggal,
-      skor_kelayakan: Number(formData.skor_kelayakan),
-      probabilitas: Number(formData.probabilitas),
-    };
-
     try {
-      const data = await riwayatService.create(newRiwayat);
-      const riwayatBaru = {
-        id: data.id || Date.now(),
-        lahan: data.lahan || newRiwayat.lahan,
-        tanggal: data.tanggal || newRiwayat.tanggal,
-        skor_kelayakan: data.skor_kelayakan || newRiwayat.skor_kelayakan,
-        probabilitas: data.probabilitas || newRiwayat.probabilitas,
-      };
-
-      setDataRiwayat([riwayatBaru, ...dataRiwayat]);
+      const created = await riwayatService.create({
+        lahan: formData.lahan,
+        tanggal: formData.tanggal,
+        skor_kelayakan: Number(formData.skor_kelayakan),
+        probabilitas: Number(formData.probabilitas),
+      });
+      setData((prev) => [created, ...prev]);
       showToast("Riwayat penilaian berhasil ditambahkan!", "success");
       setShowForm(false);
-      setFormData({
-        lahan: "",
-        tanggal: "",
-        skor_kelayakan: "",
-        probabilitas: "",
-      });
+      setFormData(EMPTY_FORM);
     } catch {
       showToast("Gagal menambahkan riwayat.", "error");
     }
@@ -93,93 +85,56 @@ export function RiwayatPenilaian() {
 
   return (
     <div className="data-page">
-      <div className="data-page-header">
-        <div>
-          <h1>RIWAYAT PENILAIAN</h1>
-          <p>Riwayat hasil analisis dan evaluasi kelayakan lahan jagung MaizeFit</p>
-        </div>
-      </div>
-
       <div className="data-table-card">
-        <div className="data-table-header">
-          <h2>Daftar Riwayat Penilaian Lahan</h2>
-        </div>
-
         <div className="data-toolbar">
-          <Button className="data-add-button" onClick={handleTambah}>
-            ＋ Tambah Penilaian
-          </Button>
-
-          <Input
-            type="text"
-            className="data-search"
-            placeholder="Cari nama lahan..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <span className="data-toolbar-title">Riwayat Penilaian</span>
+          <div className="data-toolbar-right">
+            <Input
+              className="data-search"
+              placeholder="Cari nama lahan..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Button className="data-add-button" onClick={openCreate}>
+              + Tambah
+            </Button>
+          </div>
         </div>
 
         <div className="data-table-wrapper">
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ width: "60px" }}>ID</th>
+                <th style={{ width: 48 }}>ID</th>
                 <th>Nama Lahan</th>
-                <th>Tanggal Penilaian</th>
-                <th>Skor Kelayakan</th>
-                <th>Probabilitas</th>
-                <th style={{ width: "120px" }}>Aksi</th>
+                <th style={{ width: 140 }}>Tanggal</th>
+                <th style={{ width: 120 }}>Skor</th>
+                <th style={{ width: 120 }}>Probabilitas</th>
+                <th style={{ width: 100 }}>Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center", padding: "30px" }}>
-                    Memuat riwayat penilaian...
+                  <td colSpan="6" className="data-empty">
+                    Memuat data...
                   </td>
                 </tr>
-              ) : dataFiltered.length > 0 ? (
-                dataFiltered.map((item) => (
+              ) : filtered.length > 0 ? (
+                filtered.map((item) => (
                   <tr key={item.id}>
                     <td>{item.id}</td>
-                    <td><strong>{item.lahan}</strong></td>
+                    <td>
+                      <strong>{item.lahan}</strong>
+                    </td>
                     <td>{item.tanggal}</td>
                     <td>
-                      <span
-                        style={{
-                          fontWeight: 700,
-                          color:
-                            item.skor_kelayakan >= 0.75
-                              ? "#16a34a"
-                              : item.skor_kelayakan >= 0.5
-                              ? "#d97706"
-                              : "#dc2626",
-                        }}
-                      >
+                      <span className={skorClass(item.skor_kelayakan)}>
                         {item.skor_kelayakan}
                       </span>
                     </td>
                     <td>
-                      <span
-                        style={{
-                          padding: "3px 8px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 600,
-                          backgroundColor:
-                            item.probabilitas >= 75
-                              ? "rgba(22, 163, 74, 0.12)"
-                              : item.probabilitas >= 50
-                              ? "rgba(245, 158, 11, 0.12)"
-                              : "rgba(220, 38, 38, 0.12)",
-                          color:
-                            item.probabilitas >= 75
-                              ? "#16a34a"
-                              : item.probabilitas >= 50
-                              ? "#d97706"
-                              : "#dc2626",
-                        }}
-                      >
+                      <span className={probBadgeClass(item.probabilitas)}>
                         {item.probabilitas}%
                       </span>
                     </td>
@@ -198,7 +153,7 @@ export function RiwayatPenilaian() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center", padding: "30px" }}>
+                  <td colSpan="6" className="data-empty">
                     Tidak ada riwayat penilaian.
                   </td>
                 </tr>
@@ -208,12 +163,12 @@ export function RiwayatPenilaian() {
         </div>
       </div>
 
-      {/* DETAIL MODAL */}
+      {/* Modal Detail */}
       {selectedData && (
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h3>Detail Penilaian Lahan</h3>
+              <h3>Detail Penilaian</h3>
               <button
                 type="button"
                 className="modal-close"
@@ -222,7 +177,6 @@ export function RiwayatPenilaian() {
                 ✕
               </button>
             </div>
-
             <div className="detail-riwayat">
               <div className="detail-item">
                 <span>Nama Lahan</span>
@@ -234,23 +188,22 @@ export function RiwayatPenilaian() {
               </div>
               <div className="detail-item">
                 <span>Skor Kelayakan</span>
-                <strong style={{ color: "var(--primary)" }}>
+                <strong className={skorClass(selectedData.skor_kelayakan)}>
                   {selectedData.skor_kelayakan}
                 </strong>
               </div>
               <div className="detail-item">
-                <span>Tingkat Kepastian / Probabilitas</span>
+                <span>Probabilitas</span>
                 <strong>{selectedData.probabilitas}%</strong>
               </div>
               <div className="detail-item">
                 <span>Status Rekomendasi</span>
                 <strong
-                  style={{
-                    color:
-                      selectedData.probabilitas >= 70
-                        ? "#16a34a"
-                        : "#dc2626",
-                  }}
+                  className={
+                    selectedData.probabilitas >= 70
+                      ? "skor-tinggi"
+                      : "skor-rendah"
+                  }
                 >
                   {selectedData.probabilitas >= 70
                     ? "Sangat Layak untuk Budidaya Jagung"
@@ -258,17 +211,14 @@ export function RiwayatPenilaian() {
                 </strong>
               </div>
             </div>
-
             <div className="modal-actions">
-              <Button type="button" onClick={() => setSelectedData(null)}>
-                Tutup
-              </Button>
+              <Button onClick={() => setSelectedData(null)}>Tutup</Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL TAMBAH PENILAIAN */}
+      {/* Modal Tambah */}
       {showForm && (
         <div className="modal-backdrop">
           <div className="modal-card">
@@ -282,7 +232,6 @@ export function RiwayatPenilaian() {
                 ✕
               </button>
             </div>
-
             <form onSubmit={handleSubmit}>
               <div className="modal-field">
                 <label>Nama Lahan</label>
@@ -294,7 +243,6 @@ export function RiwayatPenilaian() {
                   required
                 />
               </div>
-
               <div className="modal-field">
                 <label>Tanggal Penilaian</label>
                 <Input
@@ -305,10 +253,15 @@ export function RiwayatPenilaian() {
                   required
                 />
               </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 12,
+                }}
+              >
                 <div className="modal-field">
-                  <label>Skor Kelayakan (0 - 1)</label>
+                  <label>Skor Kelayakan (0 – 1)</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -335,7 +288,6 @@ export function RiwayatPenilaian() {
                   />
                 </div>
               </div>
-
               <div className="modal-actions">
                 <Button
                   type="button"
@@ -344,7 +296,7 @@ export function RiwayatPenilaian() {
                 >
                   Batal
                 </Button>
-                <Button type="submit">Simpan Riwayat</Button>
+                <Button type="submit">Simpan</Button>
               </div>
             </form>
           </div>

@@ -11,7 +11,6 @@ import {
   LogIn,
   Check,
 } from "lucide-react";
-import { Button } from "../../components/ui/button";
 import { useAuth } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationContext";
 
@@ -19,16 +18,23 @@ export function Login({ onLogin }) {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { showToast } = useNotification();
+
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  const [rememberMe, setRememberMe] = useState(
-    () => !localStorage.getItem("maizefit_remembered_username")
+  const [rememberMe, setRememberMe] = useState(() =>
+    Boolean(localStorage.getItem("maizefit_remembered_username")),
   );
-
   const [rememberedUsername] = useState(
-    () => localStorage.getItem("maizefit_remembered_username") || "admin"
+    () => localStorage.getItem("maizefit_remembered_username") || "",
   );
+  const [rememberedPassword] = useState(() => {
+    try {
+      const enc = localStorage.getItem("maizefit_remembered_password");
+      return enc ? atob(enc) : "";
+    } catch {
+      return "";
+    }
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +45,10 @@ export function Login({ onLogin }) {
     let result;
     if (onLogin) {
       const ok = onLogin(username, password);
-      result = { success: ok, message: ok ? "" : "Username atau password salah!" };
+      result = {
+        success: ok,
+        message: ok ? "" : "Username atau password salah!",
+      };
     } else {
       result = await login(username, password);
     }
@@ -52,8 +61,10 @@ export function Login({ onLogin }) {
 
       if (rememberMe) {
         localStorage.setItem("maizefit_remembered_username", username);
+        localStorage.setItem("maizefit_remembered_password", btoa(password));
       } else {
         localStorage.removeItem("maizefit_remembered_username");
+        localStorage.removeItem("maizefit_remembered_password");
       }
 
       showToast("Selamat datang kembali di MaizeFit!", "success");
@@ -63,14 +74,10 @@ export function Login({ onLogin }) {
 
   return (
     <div className="login-page">
-      <div className="login-page-decoration login-decoration-top" />
-      <div className="login-page-decoration login-decoration-bottom" />
-
       <div className="login-card">
-        {/* PANEL KIRI */}
-        <section className="login-info">
-          <div className="login-top-shape" />
-
+        {/* ===================== PANEL KIRI ===================== */}
+        <section className="login-info" aria-hidden="true">
+          {/* Brand */}
           <div className="login-brand">
             <img
               src="/assets/logo.png"
@@ -83,36 +90,41 @@ export function Login({ onLogin }) {
             </div>
           </div>
 
+          {/* Fitur */}
           <div className="login-feature-wrapper">
             <p className="login-feature-lead">
               Solusi cerdas untuk analisis dan evaluasi kesesuaian lahan tanaman
-              jagung berbasis data geospasial & metode pakar.
+              jagung berbasis data geospasial dan metode pakar.
             </p>
 
             <div className="login-feature-list">
               <div className="login-feature">
                 <div className="feature-icon">
-                  <Leaf size={22} />
+                  <Leaf size={20} />
                 </div>
                 <div>
                   <strong>Analisis Akurat</strong>
-                  <span>Penilaian lahan dengan parameter ilmiah dan terpercaya</span>
+                  <span>
+                    Penilaian lahan dengan parameter ilmiah dan terpercaya
+                  </span>
                 </div>
               </div>
 
               <div className="login-feature">
                 <div className="feature-icon">
-                  <BarChart3 size={22} />
+                  <BarChart3 size={20} />
                 </div>
                 <div>
                   <strong>Meningkatkan Produktivitas</strong>
-                  <span>Rekomendasi berbasis data untuk hasil panen lebih baik</span>
+                  <span>
+                    Rekomendasi berbasis data untuk hasil panen lebih baik
+                  </span>
                 </div>
               </div>
 
               <div className="login-feature">
                 <div className="feature-icon">
-                  <MapPin size={22} />
+                  <MapPin size={20} />
                 </div>
                 <div>
                   <strong>Mudah Digunakan</strong>
@@ -122,14 +134,20 @@ export function Login({ onLogin }) {
             </div>
           </div>
 
+          {/* Ilustrasi footer */}
           <div className="login-bottom-decoration">
-            <img src="/assets/footer.png" alt="" className="login-footer-image" />
+            <img
+              src="/assets/footer.png"
+              alt=""
+              className="login-footer-image"
+            />
           </div>
         </section>
 
-        {/* PANEL KANAN */}
+        {/* ===================== PANEL KANAN ===================== */}
         <section className="login-form-panel">
           <div className="login-form-container">
+            {/* Logo kecil (hanya tampil di mobile) */}
             <div className="login-form-logo">
               <img
                 src="/assets/logo.png"
@@ -139,19 +157,21 @@ export function Login({ onLogin }) {
               <span>MaizeFit</span>
             </div>
 
+            {/* Judul */}
             <div className="login-form-header">
               <h2>Selamat Datang Kembali</h2>
-              <p>
-                Masuk ke akun Anda untuk melanjutkan ke sistem MaizeFit.
-              </p>
+              <p>Masuk ke akun Anda untuk melanjutkan ke sistem MaizeFit.</p>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            {/* Form */}
+            <form onSubmit={handleSubmit} noValidate>
+              {/* Username */}
               <div className="form-group">
-                <label>Email atau Username</label>
+                <label htmlFor="username">Username</label>
                 <div className="input-wrapper">
-                  <UserRound className="input-icon-svg" size={20} />
+                  <UserRound className="input-icon-svg" size={18} />
                   <input
+                    id="username"
                     name="username"
                     type="text"
                     placeholder="Masukkan username"
@@ -163,39 +183,37 @@ export function Login({ onLogin }) {
                 </div>
               </div>
 
+              {/* Password */}
               <div className="form-group">
-                <label>Password</label>
+                <label htmlFor="password">Password</label>
                 <div className="input-wrapper">
-                  <LockKeyhole className="input-icon-svg" size={20} />
+                  <LockKeyhole className="input-icon-svg" size={18} />
                   <input
+                    id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Masukkan password"
+                    defaultValue={rememberedPassword}
                     autoComplete="current-password"
-                    defaultValue="admin123"
                     required
                     onChange={() => setError("")}
                   />
                   <button
                     type="button"
                     className="password-toggle-btn"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: "0 8px",
-                      display: "flex",
-                      alignItems: "center",
-                      color: "var(--text-hint)",
-                    }}
-                    aria-label="Toggle password"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={
+                      showPassword
+                        ? "Sembunyikan password"
+                        : "Tampilkan password"
+                    }
                   >
-                    {showPassword ? <Eye size={19} /> : <EyeOff size={19} />}
+                    {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
                 </div>
               </div>
 
+              {/* Opsi bawah */}
               <div className="login-options">
                 <label className="remember-me">
                   <input
@@ -204,42 +222,32 @@ export function Login({ onLogin }) {
                     onChange={(e) => setRememberMe(e.target.checked)}
                   />
                   <span className="custom-check">
-                    {rememberMe && <Check size={13} />}
+                    {rememberMe && <Check size={11} />}
                   </span>
                   <span>Ingat saya</span>
                 </label>
 
-                <span style={{ fontSize: "12px", color: "var(--text-hint)" }}>
+                <span className="login-demo-hint">
                   Demo: <strong>admin / admin123</strong>
                 </span>
               </div>
 
-              {error && <div className="login-error">{error}</div>}
+              {/* Error */}
+              {error && (
+                <div className="login-error" role="alert">
+                  {error}
+                </div>
+              )}
 
-              <Button type="submit" className="login-submit">
-                <LogIn size={19} />
+              {/* Submit */}
+              <button type="submit" className="login-submit">
+                <LogIn size={18} />
                 <span>Masuk</span>
-              </Button>
+              </button>
 
-              <div
-                style={{
-                  marginTop: "20px",
-                  textAlign: "center",
-                  fontSize: "14px",
-                  color: "var(--text-secondary)",
-                }}
-              >
-                Belum punya akun?{" "}
-                <Link
-                  to="/register"
-                  style={{
-                    color: "var(--primary)",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                  }}
-                >
-                  Daftar sekarang
-                </Link>
+              {/* Link register */}
+              <div className="login-register-link">
+                Belum punya akun? <Link to="/register">Daftar sekarang</Link>
               </div>
             </form>
           </div>

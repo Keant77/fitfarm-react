@@ -5,275 +5,235 @@
 .login-page {
   min-height: 100vh;
   width: 100%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  padding: 32px;
+  padding: 24px;
   box-sizing: border-box;
-
-  background: #eef8f4;
-
+  background: linear-gradient(135deg, #e8f5ed 0%, #d4ede2 50%, #eaf4ef 100%);
   position: relative;
   overflow: hidden;
 }
 
+/* Lingkaran dekoratif latar */
+.login-page::before,
+.login-page::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.login-page::before {
+  width: 480px;
+  height: 480px;
+  top: -160px;
+  left: -120px;
+  background: radial-gradient(circle, rgba(15, 109, 58, 0.09), transparent 70%);
+}
+
+.login-page::after {
+  width: 360px;
+  height: 360px;
+  bottom: -120px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(15, 109, 58, 0.07), transparent 70%);
+}
 
 /* =====================================================
-   CARD UTAMA
+   KARTU UTAMA
 ===================================================== */
 
 .login-card {
-  width: min(1120px, 100%);
-  min-height: 680px;
-
+  width: min(1080px, 100%);
+  min-height: 640px;
   display: flex;
-
   position: relative;
   z-index: 2;
-
   overflow: hidden;
-
-  border-radius: 18px;
-
-  background: #ffffff;
-
+  border-radius: 20px;
+  background: #fff;
   box-shadow:
-    0 20px 60px rgba(0, 70, 45, 0.14);
+    0 4px 6px rgba(0, 0, 0, 0.04),
+    0 20px 48px rgba(0, 60, 40, 0.11);
 }
-
 
 /* =====================================================
    PANEL KIRI
 ===================================================== */
 
 .login-info {
-  width: 48%;
-  min-height: 680px;
-
+  width: 46%;
   position: relative;
   overflow: hidden;
-
-  padding: 48px 44px;
+  padding: 48px 44px 0;
   box-sizing: border-box;
-
-  color: #ffffff;
-
-  background:
-    radial-gradient(
-      circle at 90% 5%,
-      rgba(46, 150, 106, 0.35),
-      transparent 28%
-    ),
-    linear-gradient(
-      145deg,
-      #006c47 0%,
-      #005b3d 48%,
-      #004b34 100%
-    );
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(155deg, #0a7a44 0%, #005c34 55%, #004027 100%);
 }
 
-
-/* =====================================================
-   ORNAMEN POJOK KANAN ATAS PANEL KIRI
-===================================================== */
-
-.login-top-shape {
+/* Aksen lingkaran di pojok kanan atas panel kiri */
+.login-info::before {
+  content: "";
   position: absolute;
-
-  width: 250px;
-  height: 170px;
-
-  right: -80px;
-  top: -100px;
-
+  width: 320px;
+  height: 320px;
+  top: -120px;
+  right: -120px;
   border-radius: 50%;
-
-  background: rgba(48, 145, 103, 0.3);
-
-  transform: rotate(12deg);
-
+  background: rgba(255, 255, 255, 0.06);
   pointer-events: none;
 }
 
+.login-info::after {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: -60px;
+  right: -60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+/* Elemen .login-top-shape tidak lagi dipakai tapi dipertahankan agar tidak error */
+.login-top-shape {
+  display: none;
+}
 
 /* =====================================================
-   LOGO
+   BRAND — PANEL KIRI
 ===================================================== */
 
-.login-brand,
-.login-form-logo {
+.login-brand {
   display: flex;
   align-items: center;
-
-  gap: 12px;
-
-  font-size: 27px;
-  font-weight: 700;
-
-  letter-spacing: -0.5px;
-
+  gap: 14px;
   position: relative;
-  z-index: 10;
+  z-index: 2;
 }
 
-.login-brand {
-  color: #ffffff;
+.login-brand-text h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #fff;
+  line-height: 1.1;
 }
 
-.login-form-logo {
-  justify-content: center;
-
-  color: #07543d;
-
-  margin-bottom: 38px;
+.login-brand-text p {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.4;
 }
 
 .login-logo-image {
-  width: 52px;
-  height: 52px;
-
+  width: 48px;
+  height: 48px;
   object-fit: contain;
-
   flex-shrink: 0;
-
   display: block;
+  /* Sedikit bersih dengan background transparan bulat */
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 6px;
+  box-sizing: border-box;
 }
-
 
 /* =====================================================
-   KONTEN PANEL KIRI
+   KONTEN FITUR — PANEL KIRI
 ===================================================== */
 
-.login-info-content {
-  position: relative;
-  z-index: 10;
-
-  margin-top: 58px;
-}
-
-.login-info-content h1 {
-  margin: 0 0 18px;
-
-  font-size: 39px;
-  line-height: 1.13;
-
-  letter-spacing: -1px;
-}
-
-.login-info-content > p {
-  max-width: 390px;
-
-  margin: 0;
-
-  font-size: 15px;
-  line-height: 1.6;
-
-  color: rgba(255, 255, 255, 0.82);
-}
-
-
-/* =====================================================
-   FEATURES
-===================================================== */
-
-.login-features {
-  margin-top: 38px;
-
+.login-feature-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
-
-  gap: 20px;
-
+  justify-content: center;
   position: relative;
-  z-index: 10;
+  z-index: 2;
+  padding-bottom: 24px;
+}
+
+.login-feature-lead {
+  margin: 0 0 32px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 340px;
+}
+
+.login-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .login-feature {
   display: flex;
   align-items: flex-start;
-
-  gap: 15px;
-
-  position: relative;
-  z-index: 11;
+  gap: 16px;
 }
 
 .feature-icon {
-  width: 46px;
-  height: 46px;
-
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-radius: 14px;
-
-  background: rgba(255, 255, 255, 0.16);
-
-  color: #ffffff;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.13);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.2s;
 }
 
 .login-feature div:last-child {
   display: flex;
   flex-direction: column;
-
-  gap: 4px;
-
+  gap: 3px;
   padding-top: 2px;
 }
 
 .login-feature strong {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
+  color: #fff;
 }
 
 .login-feature span {
   font-size: 12px;
-  line-height: 1.45;
-
-  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.65);
 }
 
-
 /* =====================================================
-   FOOTER / ILUSTRASI BAWAH
+   DEKORASI FOOTER PANEL KIRI
 ===================================================== */
 
 .login-bottom-decoration {
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  height: 120px;
-
-  z-index: 1;
-
+  position: relative;
+  height: 110px;
   overflow: hidden;
-
-  pointer-events: none;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .login-footer-image {
   position: absolute;
-
   left: 0;
-  bottom: -10px;
-
-  height: 120px;
-  width: 600px;
-
+  bottom: 0;
+  height: 110px;
+  width: auto;
+  max-width: 100%;
   display: block;
-
   pointer-events: none;
+  opacity: 0.6;
 }
 
 /* =====================================================
@@ -281,157 +241,160 @@
 ===================================================== */
 
 .login-form-panel {
-  width: 52%;
-  min-height: 680px;
-
-  padding: 50px 62px;
-
+  width: 54%;
+  min-height: 640px;
+  padding: 56px 64px;
   box-sizing: border-box;
-
-  background: #ffffff;
-
+  background: #fff;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
 .login-form-container {
   width: 100%;
-  max-width: 430px;
+  max-width: 400px;
 }
 
+/* =====================================================
+   LOGO KECIL DI PANEL KANAN (mobile)
+===================================================== */
+
+.login-form-logo {
+  display: none; /* disembunyikan di desktop — panel kiri sudah ada logo */
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+  margin-bottom: 36px;
+}
+
+.login-form-logo .login-logo-image {
+  background: var(--primary-light);
+  padding: 6px;
+}
 
 /* =====================================================
    HEADER FORM
 ===================================================== */
 
 .login-form-header {
-  text-align: center;
-
-  margin-bottom: 38px;
+  margin-bottom: 32px;
 }
 
 .login-form-header h2 {
-  margin: 0 0 10px;
-
-  color: #064d3b;
-
-  font-size: 27px;
-  line-height: 1.25;
+  margin: 0 0 8px;
+  color: #0d3d2a;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .login-form-header p {
   margin: 0;
-
-  color: #78908a;
-
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 13.5px;
   line-height: 1.6;
 }
 
-
 /* =====================================================
-   FORM
+   FIELD FORM
 ===================================================== */
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
   display: block;
-
-  margin-bottom: 8px;
-
+  margin-bottom: 7px;
   color: #164e41;
-
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .input-wrapper {
-  height: 45px;
-
+  height: 46px;
   display: flex;
   align-items: center;
-
-  border: 1px solid #b9e1d6;
-  border-radius: 7px;
-
-  background: #ffffff;
-
+  border: 1.5px solid #d1e9df;
+  border-radius: 10px;
+  background: #f8fcfa;
   transition:
     border-color 0.2s ease,
+    background 0.2s ease,
     box-shadow 0.2s ease;
 }
 
 .input-wrapper:focus-within {
-  border-color: #0a9b62;
-
-  box-shadow:
-    0 0 0 3px rgba(10, 155, 98, 0.08);
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3.5px rgba(15, 109, 58, 0.1);
 }
 
 .input-icon-svg {
   margin-left: 14px;
-
   flex-shrink: 0;
-
-  color: #138d68;
-}
-
-.password-icon-svg {
-  margin-right: 13px;
-
-  flex-shrink: 0;
-
-  color: #8aa49e;
+  color: #3fa96a;
+  opacity: 0.75;
 }
 
 .input-wrapper input {
   width: 100%;
   height: 100%;
-
   padding: 0 12px;
-
   border: none;
   outline: none;
-
   background: transparent;
-
-  color: #21483f;
-
-  font-size: 13px;
+  color: #1a3d2f;
+  font-size: 13.5px;
 }
 
 .input-wrapper input::placeholder {
-  color: #9bb6b0;
+  color: #a3bdb5;
 }
 
+/* Tombol toggle password */
+.password-toggle-btn {
+  background: none !important;
+  border: none !important;
+  cursor: pointer;
+  padding: 0 12px !important;
+  display: flex;
+  align-items: center;
+  color: #8aada5;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary);
+}
 
 /* =====================================================
-   LOGIN OPTIONS
+   BARIS OPSI (ingat saya + hint demo)
 ===================================================== */
 
 .login-options {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  margin-top: 5px;
-  margin-bottom: 24px;
+  margin: 4px 0 22px;
 }
 
 .remember-me {
   display: flex;
   align-items: center;
-
   gap: 8px;
-
-  color: #718b84;
-
-  font-size: 12px;
-
+  color: var(--text-secondary);
+  font-size: 12.5px;
   cursor: pointer;
+  user-select: none;
 }
 
 .remember-me input {
@@ -439,144 +402,117 @@
 }
 
 .custom-check {
-  width: 19px;
-  height: 19px;
-
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 5px;
-
-  border: 1px solid #b5dcd0;
-
-  color: #ffffff;
-
-  background: #ffffff;
+  border: 1.5px solid #c0d8cf;
+  background: #fff;
+  color: #fff;
+  flex-shrink: 0;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .remember-me input:checked + .custom-check {
-  background: #07965e;
-
-  border-color: #07965e;
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
-.forgot-password {
-  padding: 0;
-
-  border: none;
-
-  background: transparent;
-
-  color: #078c5a;
-
+/* Hint demo kredensial */
+.login-demo-hint {
   font-size: 12px;
-  font-weight: 600;
-
-  cursor: pointer;
+  color: var(--text-hint);
+  background: var(--primary-light);
+  padding: 3px 10px;
+  border-radius: 20px;
 }
 
-.forgot-password:hover {
-  text-decoration: underline;
+.login-demo-hint strong {
+  color: var(--primary);
 }
-
 
 /* =====================================================
-   ERROR
+   PESAN ERROR
 ===================================================== */
 
 .login-error {
-  margin-bottom: 15px;
-
-  padding: 10px 12px;
-
-  border-radius: 7px;
-
-  background: #fff0f0;
-
-  color: #c62828;
-
-  font-size: 12px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  border-left: 3px solid var(--error);
+  background: var(--error-background);
+  color: var(--error);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-
 /* =====================================================
-   BUTTON LOGIN
+   TOMBOL SUBMIT
 ===================================================== */
 
 .login-submit {
   width: 100%;
-  height: 45px;
-
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-
   gap: 8px;
-
   border: none;
-  border-radius: 7px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #06965d,
-      #078550
-    );
-
-  color: #ffffff;
-
-  font-size: 14px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0e8d54, #0a6e40);
+  color: #fff;
+  font-size: 14.5px;
   font-weight: 700;
-
-  box-shadow:
-    0 7px 18px rgba(0, 133, 80, 0.18);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(10, 110, 64, 0.28);
+  transition:
+    background 0.2s,
+    box-shadow 0.2s,
+    transform 0.1s;
 }
 
 .login-submit:hover {
-  background:
-    linear-gradient(
-      135deg,
-      #078b58,
-      #057748
-    );
+  background: linear-gradient(135deg, #0c7c4a, #085e38);
+  box-shadow: 0 6px 18px rgba(10, 110, 64, 0.34);
 }
 
+.login-submit:active {
+  transform: scale(0.98);
+}
 
 /* =====================================================
-   ORNAMEN LUAR HALAMAN
+   TAUTAN REGISTER
+===================================================== */
+
+.login-register-link {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.login-register-link a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-register-link a:hover {
+  text-decoration: underline;
+}
+
+/* =====================================================
+   DEKORASI ORNAMEN LUAR — tidak dipakai lagi tapi dipertahankan
 ===================================================== */
 
 .login-page-decoration {
-  position: absolute;
-
-  pointer-events: none;
+  display: none;
 }
-
-.login-decoration-top {
-  width: 220px;
-  height: 220px;
-
-  top: -110px;
-  right: -80px;
-
-  border-radius: 50%;
-
-  background: rgba(179, 228, 211, 0.35);
-}
-
-.login-decoration-bottom {
-  width: 190px;
-  height: 190px;
-
-  bottom: -110px;
-  right: -70px;
-
-  border-radius: 50%;
-
-  background: rgba(179, 228, 211, 0.45);
-}
-
 
 /* =====================================================
    RESPONSIVE
@@ -584,11 +520,16 @@
 
 @media (max-width: 900px) {
   .login-page {
-    padding: 20px;
+    padding: 16px;
+    align-items: flex-start;
+    padding-top: 40px;
   }
 
   .login-card {
-    max-width: 700px;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: auto;
+    border-radius: 18px;
   }
 
   .login-info {
@@ -597,38 +538,37 @@
 
   .login-form-panel {
     width: 100%;
-    min-height: 650px;
-
+    padding: 44px 36px;
+    min-height: auto;
     border-radius: 18px;
+  }
 
-    padding: 45px 40px;
+  /* Tampilkan logo kecil di panel kanan saat mobile */
+  .login-form-logo {
+    display: flex;
   }
 }
 
 @media (max-width: 480px) {
   .login-page {
     padding: 12px;
+    padding-top: 28px;
   }
 
   .login-form-panel {
-    padding: 35px 22px;
-
-    min-height: 620px;
-  }
-
-  .login-form-logo {
-    margin-bottom: 28px;
+    padding: 36px 24px;
   }
 
   .login-form-header h2 {
-    font-size: 23px;
+    font-size: 22px;
   }
 
   .login-form-header p {
-    font-size: 12px;
+    font-size: 13px;
   }
 
-  .login-options {
-    margin-bottom: 20px;
+  .login-submit {
+    height: 44px;
+    font-size: 14px;
   }
 }

@@ -25,7 +25,9 @@ export const ThemeProvider = ({ children }) => {
 
   const [primaryColor, setPrimaryColorState] = useState(() => {
     try {
-      return localStorage.getItem("app-primary-color") || THEME_DEFAULTS.primary;
+      return (
+        localStorage.getItem("app-primary-color") || THEME_DEFAULTS.primary
+      );
     } catch {
       return THEME_DEFAULTS.primary;
     }
@@ -33,7 +35,9 @@ export const ThemeProvider = ({ children }) => {
 
   const [secondaryColor, setSecondaryColorState] = useState(() => {
     try {
-      return localStorage.getItem("app-secondary-color") || THEME_DEFAULTS.secondary;
+      return (
+        localStorage.getItem("app-secondary-color") || THEME_DEFAULTS.secondary
+      );
     } catch {
       return THEME_DEFAULTS.secondary;
     }
@@ -108,7 +112,7 @@ export const ThemeProvider = ({ children }) => {
       setPrimaryColor,
       setSecondaryColor,
       resetTheme,
-    ]
+    ],
   );
 
   return (
@@ -125,8 +129,5 @@ export const useTheme = () => {
   }
   return context;
 };
-
-// Alias untuk kompatibilitas
-export const useAdvancedTheme = useTheme;
 
 export default ThemeContext;

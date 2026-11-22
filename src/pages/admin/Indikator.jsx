@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { indikatorService } from "../../services/api";
@@ -7,41 +6,41 @@ import { useNotification } from "../../context/NotificationContext";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 export function Indikator() {
-  const navigate = useNavigate();
   const { showToast } = useNotification();
-  const [dataIndikator, setDataIndikator] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [formData, setFormData] = useState({ nama: "" });
 
   useEffect(() => {
     indikatorService
       .getAll()
-      .then((data) => setDataIndikator(data))
-      .catch((err) => {
-        console.error("Gagal load indikator:", err);
-        showToast("Gagal memuat indikator", "error");
-      })
+      .then(setData)
+      .catch(() => showToast("Gagal memuat indikator", "error"))
       .finally(() => setLoading(false));
   }, [showToast]);
 
-  const filteredData = dataIndikator.filter((item) =>
-    item.nama.toLowerCase().includes(search.toLowerCase())
+  const filtered = data.filter((item) =>
+    item.nama.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const handleTambah = () => {
+  const openCreate = () => {
     setEditId(null);
     setFormData({ nama: "" });
     setShowForm(true);
   };
-
-  const handleEdit = (item) => {
+  const openEdit = (item) => {
     setEditId(item.id);
     setFormData({ nama: item.nama });
     setShowForm(true);
+  };
+  const closeForm = () => {
+    setShowForm(false);
+    setFormData({ nama: "" });
+    setEditId(null);
   };
 
   const handleSubmit = async (e) => {
@@ -51,30 +50,34 @@ export function Indikator() {
       return;
     }
 
-    if (editId !== null) {
-      const updated = { id: editId, nama: formData.nama };
-      await indikatorService.update(editId, updated);
-      setDataIndikator(
-        dataIndikator.map((item) => (item.id === editId ? updated : item))
-      );
-      showToast("Indikator berhasil diubah!", "success");
-    } else {
-      const created = await indikatorService.create({ nama: formData.nama });
-      setDataIndikator([...dataIndikator, created]);
-      showToast("Indikator baru berhasil ditambahkan!", "success");
+    try {
+      if (editId !== null) {
+        const updated = { id: editId, nama: formData.nama };
+        await indikatorService.update(editId, updated);
+        setData((prev) =>
+          prev.map((item) => (item.id === editId ? updated : item)),
+        );
+        showToast("Indikator berhasil diubah!", "success");
+      } else {
+        const created = await indikatorService.create({ nama: formData.nama });
+        setData((prev) => [...prev, created]);
+        showToast("Indikator berhasil ditambahkan!", "success");
+      }
+      closeForm();
+    } catch {
+      showToast("Gagal menyimpan indikator.", "error");
     }
-
-    setShowForm(false);
-    setFormData({ nama: "" });
-    setEditId(null);
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
       await indikatorService.delete(deleteTarget.id);
-      setDataIndikator(dataIndikator.filter((i) => i.id !== deleteTarget.id));
-      showToast(`Indikator "${deleteTarget.nama}" berhasil dihapus!`, "success");
+      setData((prev) => prev.filter((i) => i.id !== deleteTarget.id));
+      showToast(
+        `Indikator "${deleteTarget.nama}" berhasil dihapus!`,
+        "success",
+      );
     } catch {
       showToast("Gagal menghapus indikator.", "error");
     } finally {
@@ -84,66 +87,51 @@ export function Indikator() {
 
   return (
     <div className="data-page">
-      <div className="data-page-header">
-        <div>
-          <h1>DATA INDIKATOR</h1>
-          <p>Kriteria indikator penilaian kelayakan lahan tanaman jagung MaizeFit</p>
-        </div>
-
-        <button
-          className="data-back-button"
-          onClick={() => navigate("/admin/master")}
-        >
-          ← Master Data
-        </button>
-      </div>
-
       <div className="data-table-card">
-        <div className="data-table-header">
-          <h2>Daftar Indikator Penilaian</h2>
-        </div>
-
         <div className="data-toolbar">
-          <Button className="data-add-button" onClick={handleTambah}>
-            ＋ Tambah Indikator
-          </Button>
-
-          <Input
-            type="text"
-            className="data-search"
-            placeholder="Cari indikator..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <span className="data-toolbar-title">Data Indikator</span>
+          <div className="data-toolbar-right">
+            <Input
+              className="data-search"
+              placeholder="Cari indikator..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Button className="data-add-button" onClick={openCreate}>
+              + Tambah
+            </Button>
+          </div>
         </div>
 
         <div className="data-table-wrapper">
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ width: "80px" }}>No</th>
+                <th style={{ width: 56 }}>No</th>
                 <th>Nama Indikator</th>
-                <th style={{ width: "160px" }}>Aksi</th>
+                <th style={{ width: 140 }}>Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="3" style={{ textAlign: "center", padding: "30px" }}>
-                    Memuat data indikator...
+                  <td colSpan="3" className="data-empty">
+                    Memuat data...
                   </td>
                 </tr>
-              ) : filteredData.length > 0 ? (
-                filteredData.map((item, index) => (
+              ) : filtered.length > 0 ? (
+                filtered.map((item, idx) => (
                   <tr key={item.id}>
-                    <td>{index + 1}</td>
-                    <td><strong>{item.nama}</strong></td>
+                    <td>{idx + 1}</td>
+                    <td>
+                      <strong>{item.nama}</strong>
+                    </td>
                     <td>
                       <div className="data-action">
                         <Button
                           variant="warning"
                           size="sm"
-                          onClick={() => handleEdit(item)}
+                          onClick={() => openEdit(item)}
                         >
                           Edit
                         </Button>
@@ -160,7 +148,7 @@ export function Indikator() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" style={{ textAlign: "center", padding: "30px" }}>
+                  <td colSpan="3" className="data-empty">
                     Tidak ada data indikator.
                   </td>
                 </tr>
@@ -174,12 +162,8 @@ export function Indikator() {
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h3>{editId !== null ? "Edit Indikator" : "Tambah Indikator Baru"}</h3>
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setShowForm(false)}
-              >
+              <h3>{editId !== null ? "Edit Indikator" : "Tambah Indikator"}</h3>
+              <button type="button" className="modal-close" onClick={closeForm}>
                 ✕
               </button>
             </div>
@@ -187,7 +171,6 @@ export function Indikator() {
               <div className="modal-field">
                 <label>Nama Indikator</label>
                 <Input
-                  type="text"
                   placeholder="Contoh: pH Tanah, Curah Hujan"
                   value={formData.nama}
                   onChange={(e) => setFormData({ nama: e.target.value })}
@@ -195,15 +178,11 @@ export function Indikator() {
                 />
               </div>
               <div className="modal-actions">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowForm(false)}
-                >
+                <Button type="button" variant="outline" onClick={closeForm}>
                   Batal
                 </Button>
                 <Button type="submit">
-                  {editId !== null ? "Simpan Perubahan" : "Tambah Indikator"}
+                  {editId !== null ? "Simpan" : "Tambah"}
                 </Button>
               </div>
             </form>
@@ -214,8 +193,8 @@ export function Indikator() {
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Hapus Indikator"
-        message={`Apakah Anda yakin ingin menghapus indikator "${deleteTarget?.nama}"?`}
-        confirmText="Hapus Indikator"
+        message={`Hapus indikator "${deleteTarget?.nama}"?`}
+        confirmText="Hapus"
         onConfirm={confirmDelete}
         onClose={() => setDeleteTarget(null)}
       />

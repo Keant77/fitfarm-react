@@ -1,9 +1,4 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { NotificationProvider } from "./context/NotificationContext";
@@ -18,7 +13,6 @@ import Register from "./pages/auth/Register";
 
 // Admin Pages
 import Dashboard from "./pages/admin/Dashboard";
-import MasterData from "./pages/admin/MasterData";
 import User from "./pages/admin/User";
 import Role from "./pages/admin/Role";
 import Kecamatan from "./pages/admin/Kecamatan";
@@ -75,7 +69,6 @@ function AppRoutes() {
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="master" element={<MasterData />} />
         <Route path="user" element={<User />} />
         <Route path="role" element={<Role />} />
         <Route path="kecamatan" element={<Kecamatan />} />
@@ -96,7 +89,9 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <ThemeProvider>
           <NotificationProvider>

@@ -5,106 +5,80 @@ import { userService } from "../../services/api";
 import { useNotification } from "../../context/NotificationContext";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
 
+const EMPTY_FORM = { nama: "", username: "", role_id: "" };
+
+function validateField(name, value) {
+  if (name === "nama") {
+    if (!value.trim()) return "Nama wajib diisi.";
+    if (value.trim().length < 3) return "Nama minimal 3 karakter.";
+  }
+  if (name === "username") {
+    if (!value.trim()) return "Username wajib diisi.";
+    if (value.trim().length < 3) return "Username minimal 3 karakter.";
+  }
+  if (name === "role_id") {
+    if (!value) return "Role wajib dipilih.";
+  }
+  return "";
+}
+
+function validateAll(formData) {
+  const errors = {};
+  for (const key of Object.keys(formData)) {
+    const err = validateField(key, formData[key]);
+    if (err) errors[key] = err;
+  }
+  return errors;
+}
+
 export function User() {
   const { showToast } = useNotification();
   const [dataUser, setDataUser] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [search, setSearch] = useState("");
-
-  const [formData, setFormData] = useState({
-    nama: "",
-    username: "",
-    password: "",
-    role_id: "",
-  });
-
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [formData, setFormData] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-
-  // Dialog konfirmasi hapus
-  const [deleteTarget, setDeleteTarget] = useState(null);
 
   useEffect(() => {
     userService
       .getAll()
-      .then((data) => setDataUser(data))
-      .catch((error) => {
-        console.error("Gagal mengambil data user:", error);
-        showToast("Gagal mengambil data pengguna", "error");
-      })
+      .then(setDataUser)
+      .catch(() => showToast("Gagal mengambil data pengguna", "error"))
       .finally(() => setLoading(false));
   }, [showToast]);
 
-  const filteredDataUser = dataUser.filter(
-    (user) =>
-      user.nama.toLowerCase().includes(search.toLowerCase()) ||
-      user.username.toLowerCase().includes(search.toLowerCase()) ||
-      String(user.role_id).includes(search)
+  const filtered = dataUser.filter(
+    (u) =>
+      u.nama.toLowerCase().includes(search.toLowerCase()) ||
+      u.username.toLowerCase().includes(search.toLowerCase()) ||
+      String(u.role_id).includes(search),
   );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (touched[name]) {
-      validateField(name, value);
+      setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
     }
   };
 
-  const validateField = (name, value) => {
-    let error = "";
-    if (name === "nama") {
-      if (!value.trim()) error = "Nama wajib diisi.";
-      else if (value.trim().length < 3) error = "Nama minimal 3 karakter.";
-    }
-    if (name === "username") {
-      if (!value.trim()) error = "Username wajib diisi.";
-      else if (value.trim().length < 3) error = "Username minimal 3 karakter.";
-    }
-    if (name === "password") {
-      if (editId === null && !value) error = "Password wajib diisi.";
-      else if (value && value.length < 6) error = "Password minimal 6 karakter.";
-    }
-    if (name === "role_id") {
-      if (!value) error = "Role wajib dipilih.";
-    }
-
-    setErrors((prev) => ({ ...prev, [name]: error }));
-    return error;
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    const namaError = validateField("nama", formData.nama);
-    const usernameError = validateField("username", formData.username);
-    const passwordError = validateField("password", formData.password);
-    const roleError = validateField("role_id", formData.role_id);
-
-    if (namaError) newErrors.nama = namaError;
-    if (usernameError) newErrors.username = usernameError;
-    if (passwordError) newErrors.password = passwordError;
-    if (roleError) newErrors.role_id = roleError;
-
-    setTouched({ nama: true, username: true, password: true, role_id: true });
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleTambah = () => {
+  const openCreate = () => {
     setEditId(null);
-    setFormData({ nama: "", username: "", password: "", role_id: "" });
+    setFormData(EMPTY_FORM);
     setErrors({});
     setTouched({});
     setShowForm(true);
   };
 
-  const handleEdit = (user) => {
+  const openEdit = (user) => {
     setEditId(user.id);
     setFormData({
       nama: user.nama,
       username: user.username,
-      password: "",
       role_id: String(user.role_id),
     });
     setErrors({});
@@ -112,66 +86,55 @@ export function User() {
     setShowForm(true);
   };
 
+  const closeForm = () => {
+    setShowForm(false);
+    setFormData(EMPTY_FORM);
+    setEditId(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
-    if (editId !== null) {
-      const updatedUser = {
-        id: editId,
-        nama: formData.nama,
-        username: formData.username,
-        password: formData.password,
-        role_id: Number(formData.role_id),
-      };
-
-      try {
-        await userService.update(editId, updatedUser);
-        setDataUser(
-          dataUser.map((user) => (user.id === editId ? updatedUser : user))
-        );
-        showToast("Pengguna berhasil diperbarui!", "success");
-      } catch (error) {
-        showToast("Gagal memperbarui pengguna.", "error");
-        return;
-      }
-    } else {
-      const newUser = {
-        nama: formData.nama,
-        username: formData.username,
-        password: formData.password,
-        role_id: Number(formData.role_id),
-      };
-
-      try {
-        const data = await userService.create(newUser);
-        const userBaru = {
-          id: data.id || Date.now(),
-          nama: data.nama || newUser.nama,
-          username: data.username || newUser.username,
-          password: data.password || newUser.password,
-          role_id: data.role_id || newUser.role_id,
-        };
-        setDataUser([...dataUser, userBaru]);
-        showToast("Pengguna baru berhasil ditambahkan!", "success");
-      } catch (error) {
-        showToast("Gagal menambahkan pengguna.", "error");
-        return;
-      }
+    const allTouched = Object.fromEntries(
+      Object.keys(EMPTY_FORM).map((k) => [k, true]),
+    );
+    setTouched(allTouched);
+    const errs = validateAll(formData);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
     }
 
-    setShowForm(false);
-    setFormData({ nama: "", username: "", password: "", role_id: "" });
-    setEditId(null);
+    const payload = {
+      nama: formData.nama,
+      username: formData.username,
+      role_id: Number(formData.role_id),
+    };
+
+    try {
+      if (editId !== null) {
+        await userService.update(editId, payload);
+        setDataUser((prev) =>
+          prev.map((u) => (u.id === editId ? { id: editId, ...payload } : u)),
+        );
+        showToast("Pengguna berhasil diperbarui!", "success");
+      } else {
+        const created = await userService.create(payload);
+        setDataUser((prev) => [...prev, created]);
+        showToast("Pengguna baru berhasil ditambahkan!", "success");
+      }
+      closeForm();
+    } catch {
+      showToast("Gagal menyimpan pengguna.", "error");
+    }
   };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
       await userService.delete(deleteTarget.id);
-      setDataUser(dataUser.filter((item) => item.id !== deleteTarget.id));
+      setDataUser((prev) => prev.filter((u) => u.id !== deleteTarget.id));
       showToast(`Pengguna "${deleteTarget.nama}" berhasil dihapus!`, "success");
-    } catch (error) {
+    } catch {
       showToast("Gagal menghapus pengguna.", "error");
     } finally {
       setDeleteTarget(null);
@@ -180,67 +143,52 @@ export function User() {
 
   return (
     <div className="data-page">
-      <div className="data-page-header">
-        <div>
-          <h1>DATA PENGGUNA</h1>
-          <p>Kelola data akun pengguna sistem MaizeFit</p>
-        </div>
-      </div>
-
       <div className="data-table-card">
-        <div className="data-table-header">
-          <h2>Daftar Pengguna</h2>
-        </div>
-
+        {/* Toolbar */}
         <div className="data-toolbar">
-          <Button className="data-add-button" onClick={handleTambah}>
-            ＋ Tambah Pengguna
-          </Button>
-
-          <Input
-            type="text"
-            className="data-search"
-            placeholder="Cari nama / username..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <span className="data-toolbar-title">Data Pengguna</span>
+          <div className="data-toolbar-right">
+            <Input
+              className="data-search"
+              placeholder="Cari nama / username..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Button className="data-add-button" onClick={openCreate}>
+              + Tambah
+            </Button>
+          </div>
         </div>
 
+        {/* Tabel */}
         <div className="data-table-wrapper">
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ width: "60px" }}>ID</th>
+                <th style={{ width: 56 }}>ID</th>
                 <th>Nama Lengkap</th>
                 <th>Username</th>
-                <th style={{ width: "120px" }}>Role ID</th>
-                <th style={{ width: "160px" }}>Aksi</th>
+                <th style={{ width: 140 }}>Role</th>
+                <th style={{ width: 140 }}>Aksi</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: "center", padding: "30px" }}>
-                    Memuat data pengguna...
+                  <td colSpan="5" className="data-empty">
+                    Memuat data...
                   </td>
                 </tr>
-              ) : filteredDataUser.length > 0 ? (
-                filteredDataUser.map((user) => (
+              ) : filtered.length > 0 ? (
+                filtered.map((user) => (
                   <tr key={user.id}>
                     <td>{user.id}</td>
-                    <td><strong>{user.nama}</strong></td>
+                    <td>
+                      <strong>{user.nama}</strong>
+                    </td>
                     <td>{user.username}</td>
                     <td>
-                      <span
-                        style={{
-                          padding: "3px 8px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 600,
-                          backgroundColor: "rgba(15, 109, 58, 0.12)",
-                          color: "var(--primary)",
-                        }}
-                      >
+                      <span className="badge badge-primary">
                         Role {user.role_id}
                       </span>
                     </td>
@@ -249,7 +197,7 @@ export function User() {
                         <Button
                           variant="warning"
                           size="sm"
-                          onClick={() => handleEdit(user)}
+                          onClick={() => openEdit(user)}
                         >
                           Edit
                         </Button>
@@ -266,7 +214,7 @@ export function User() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: "center", padding: "30px" }}>
+                  <td colSpan="5" className="data-empty">
                     Tidak ada data pengguna.
                   </td>
                 </tr>
@@ -276,21 +224,16 @@ export function User() {
         </div>
       </div>
 
-      {/* MODAL USER FORM */}
+      {/* Modal Form */}
       {showForm && (
         <div className="modal-backdrop">
           <div className="modal-card">
             <div className="modal-header">
-              <h3>{editId !== null ? "Edit Pengguna" : "Tambah Pengguna Baru"}</h3>
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setShowForm(false)}
-              >
+              <h3>{editId !== null ? "Edit Pengguna" : "Tambah Pengguna"}</h3>
+              <button type="button" className="modal-close" onClick={closeForm}>
                 ✕
               </button>
             </div>
-
             <form onSubmit={handleSubmit} noValidate>
               <div className="modal-field">
                 <label>Nama Lengkap</label>
@@ -300,9 +243,10 @@ export function User() {
                   onChange={handleChange}
                   placeholder="Masukkan nama lengkap"
                 />
-                {errors.nama && <span className="form-error">{errors.nama}</span>}
+                {touched.nama && errors.nama && (
+                  <span className="form-error">{errors.nama}</span>
+                )}
               </div>
-
               <div className="modal-field">
                 <label>Username</label>
                 <Input
@@ -311,54 +255,34 @@ export function User() {
                   onChange={handleChange}
                   placeholder="Masukkan username"
                 />
-                {errors.username && <span className="form-error">{errors.username}</span>}
+                {touched.username && errors.username && (
+                  <span className="form-error">{errors.username}</span>
+                )}
               </div>
-
-              <div className="modal-field">
-                <label>Password {editId !== null && "(Kosongkan jika tidak diubah)"}</label>
-                <Input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Minimal 6 karakter"
-                />
-                {errors.password && <span className="form-error">{errors.password}</span>}
-              </div>
-
               <div className="modal-field">
                 <label>Peran / Role</label>
                 <select
                   name="role_id"
                   value={formData.role_id}
                   onChange={handleChange}
-                  style={{
-                    padding: "10px 12px",
-                    border: "1px solid var(--border)",
-                    borderRadius: "8px",
-                    background: "var(--surface)",
-                    color: "var(--text-primary)",
-                  }}
+                  className="modal-select"
                 >
                   <option value="">Pilih Role</option>
-                  <option value="1">1 - Administrator</option>
-                  <option value="2">2 - Pakar Pertanian</option>
-                  <option value="3">3 - Petugas Lapangan</option>
-                  <option value="4">4 - Petani</option>
+                  <option value="1">1 — Administrator</option>
+                  <option value="2">2 — Pakar Pertanian</option>
+                  <option value="3">3 — Petugas Lapangan</option>
+                  <option value="4">4 — Petani</option>
                 </select>
-                {errors.role_id && <span className="form-error">{errors.role_id}</span>}
+                {touched.role_id && errors.role_id && (
+                  <span className="form-error">{errors.role_id}</span>
+                )}
               </div>
-
               <div className="modal-actions">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowForm(false)}
-                >
+                <Button type="button" variant="outline" onClick={closeForm}>
                   Batal
                 </Button>
                 <Button type="submit">
-                  {editId !== null ? "Simpan Perubahan" : "Tambah Pengguna"}
+                  {editId !== null ? "Simpan" : "Tambah"}
                 </Button>
               </div>
             </form>
@@ -366,12 +290,11 @@ export function User() {
         </div>
       )}
 
-      {/* CONFIRM DIALOG */}
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Hapus Pengguna"
-        message={`Apakah Anda yakin ingin menghapus pengguna "${deleteTarget?.nama}"? Tindakan ini tidak dapat dibatalkan.`}
-        confirmText="Hapus Pengguna"
+        message={`Hapus pengguna "${deleteTarget?.nama}"? Tindakan ini tidak dapat dibatalkan.`}
+        confirmText="Hapus"
         onConfirm={confirmDelete}
         onClose={() => setDeleteTarget(null)}
       />

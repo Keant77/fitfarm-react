@@ -1,7 +1,14 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { StatCard } from "../../components/ui/stat-card";
 import MapLahan from "../../components/MapLahan";
+import {
+  userService,
+  lahanService,
+  kecamatanService,
+  indikatorService,
+  aturanService,
+} from "../../services/api";
 
 import {
   Users,
@@ -12,58 +19,72 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+const STAT_DEFINITIONS = [
+  { key: "users", title: "Jumlah Pengguna", icon: Users, type: "green" },
+  { key: "lahan", title: "Jumlah Lahan", icon: Wheat, type: "yellow" },
+  {
+    key: "kecamatan",
+    title: "Jumlah Kecamatan",
+    icon: MapPinned,
+    type: "green",
+  },
+  { key: "indikator", title: "Jumlah Indikator", icon: Gauge, type: "green" },
+  { key: "aturan", title: "Jumlah Aturan", icon: Target, type: "green" },
+];
+
 export function Dashboard() {
   const navigate = useNavigate();
 
-  const dashboardStats = [
-    {
-      title: "Jumlah Pengguna",
-      value: "1",
-      icon: Users,
-      type: "green",
-    },
-    {
-      title: "Jumlah Lahan",
-      value: "10",
-      icon: Wheat,
-      type: "yellow",
-    },
-    {
-      title: "Jumlah Kecamatan",
-      value: "31",
-      icon: MapPinned,
-      type: "green",
-    },
-    {
-      title: "Jumlah Indikator",
-      value: "5",
-      icon: Gauge,
-      type: "green",
-    },
-    {
-      title: "Jumlah Aturan",
-      value: "15",
-      icon: Target,
-      type: "green",
-    },
-  ];
+  const [counts, setCounts] = useState({
+    users: "—",
+    lahan: "—",
+    kecamatan: "—",
+    indikator: "—",
+    aturan: "—",
+  });
+
+  useEffect(() => {
+    // Fetch semua count secara paralel
+    Promise.allSettled([
+      userService.getAll(),
+      lahanService.getAll(),
+      kecamatanService.getAll(),
+      indikatorService.getAll(),
+      aturanService.getAll(),
+    ]).then(([users, lahan, kecamatan, indikator, aturan]) => {
+      setCounts({
+        users: users.status === "fulfilled" ? String(users.value.length) : "?",
+        lahan: lahan.status === "fulfilled" ? String(lahan.value.length) : "?",
+        kecamatan:
+          kecamatan.status === "fulfilled"
+            ? String(kecamatan.value.length)
+            : "?",
+        indikator:
+          indikator.status === "fulfilled"
+            ? String(indikator.value.length)
+            : "?",
+        aturan:
+          aturan.status === "fulfilled" ? String(aturan.value.length) : "?",
+      });
+    });
+  }, []);
 
   return (
     <>
       {/* STAT CARDS */}
       <section className="dashboard-grid">
-        {dashboardStats.map((item) => (
+        {STAT_DEFINITIONS.map((stat) => (
           <StatCard
-            key={item.title}
-            title={item.title}
-            value={item.value}
-            icon={item.icon}
-            type={item.type}
+            key={stat.key}
+            title={stat.title}
+            value={counts[stat.key]}
+            icon={stat.icon}
+            type={stat.type}
           />
         ))}
       </section>
 
-      {/* MAP PLACEHOLDER */}
+      {/* MAP */}
       <section className="map-placeholder">
         <div className="map-header">
           <div className="map-title">

@@ -1,350 +1,347 @@
 /* =====================================================
-   DATA TABLE UMUM
-   Dipakai untuk:
-   User, Role, Kecamatan, Lahan,
-   dan Riwayat Penilaian
-   ===================================================== */
+   DATA TABLE — shared styles
+   User, Role, Kecamatan, Lahan, Indikator,
+   Aturan, Riwayat Penilaian
+===================================================== */
+
+.data-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* =====================================================
+   CARD TABEL
+===================================================== */
 
 .data-table-card {
   background: var(--surface);
-
   border: 1px solid var(--border);
-  border-radius: 14px;
-
+  border-radius: 12px;
   overflow: hidden;
-
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
-/* BAGIAN ATAS CARD */
-
-.data-table-header {
-  padding: 25px;
-
-  border-bottom: 1px solid var(--border);
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.data-table-header h2 {
-  margin: 0;
-
-  color: var(--text-primary);
-
-  font-size: 24px;
-}
-
-/* TOOLBAR */
+/* =====================================================
+   HEADER CARD — judul + toolbar dalam satu baris
+===================================================== */
 
 .data-toolbar {
-  padding: 25px;
-
   display: flex;
-  justify-content: space-between;
   align-items: center;
-
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border);
+  background: var(--surface);
 }
 
-/* TOMBOL TAMBAH */
+.data-toolbar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.data-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* =====================================================
+   TOMBOL TAMBAH
+===================================================== */
 
 .data-add-button {
-  padding: 12px 22px;
-
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
   border: none;
   border-radius: 8px;
-
   background: var(--primary);
-  color: white;
-
-  font-size: 15px;
+  color: #fff;
+  font-size: 13px;
   font-weight: 600;
-
+  white-space: nowrap;
   cursor: pointer;
-
-  transition: 0.2s;
+  transition: background 0.15s;
+  flex-shrink: 0;
 }
 
 .data-add-button:hover {
   background: var(--primary-dark);
 }
 
-/* SEARCH */
+/* =====================================================
+   SEARCH INPUT
+===================================================== */
 
 .data-search {
-  width: 280px;
-
-  padding: 12px 15px;
-
+  width: 240px;
+  height: 36px;
+  padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
-
-  background: var(--surface);
-
+  background: var(--background);
   color: var(--text-primary);
-
-  font-size: 14px;
-
+  font-size: 13px;
   outline: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+  box-sizing: border-box;
 }
 
 .data-search:focus {
   border-color: var(--primary);
-
-  box-shadow: 0 0 0 3px var(--primary-light);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(15, 109, 58, 0.08);
 }
 
-/* TABLE */
+.data-search::placeholder {
+  color: var(--text-hint);
+}
+
+/* =====================================================
+   WRAPPER TABEL
+===================================================== */
 
 .data-table-wrapper {
   width: 100%;
   overflow-x: auto;
 }
 
+/* =====================================================
+   TABEL
+===================================================== */
+
 .data-table {
   width: 100%;
-
   border-collapse: collapse;
-
+  font-size: 13.5px;
   color: var(--text-primary);
-
-  font-size: 15px;
 }
 
-/* HEADER TABLE */
-
-.data-table thead {
+/* Header tabel */
+.data-table thead tr {
   background: var(--primary-light);
 }
 
 .data-table th {
-  padding: 16px 18px;
-
+  padding: 11px 16px;
   text-align: left;
-
-  color: var(--primary-dark);
-
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-
+  color: var(--primary-dark);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   border-bottom: 1px solid var(--border);
+  white-space: nowrap;
 }
 
-/* ISI TABLE */
-
-.data-table td {
-  padding: 15px 18px;
-
-  border-bottom: 1px solid var(--border);
-
-  vertical-align: middle;
-}
-
-/* HOVER BARIS */
-
-.data-table tbody tr:hover {
-  background: #f8faf9;
-}
-
-/* NOMOR */
-
+/* Kolom ID / No — center */
 .data-table th:first-child,
 .data-table td:first-child {
-  width: 60px;
   text-align: center;
 }
 
-/* ACTION */
-
-.data-action {
-  display: flex;
-  gap: 8px;
-}
-
-/* BUTTON EDIT */
-
-.data-edit-button {
-  padding: 8px 14px;
-
-  border: none;
-  border-radius: 7px;
-
-  background: var(--warning);
-  color: white;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.data-edit-button:hover {
-  opacity: 0.9;
-}
-
-/* BUTTON HAPUS */
-
-.data-delete-button {
-  padding: 8px 14px;
-
-  border: none;
-  border-radius: 7px;
-
-  background: var(--error);
-  color: white;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-/* =====================================================
-   MASTER DATA
-   ===================================================== */
-
-.master-page {
-  min-height: 100vh;
-  background: var(--background);
-  padding: 40px;
-  box-sizing: border-box;
-  overflow-y: auto;
-}
-
-.master-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 35px;
-}
-
-.master-header h1 {
-  margin: 0 0 8px;
-  color: var(--text-primary);
-  font-size: 32px;
-  font-weight: 700;
-}
-
-.master-header p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 16px;
-}
-
-.back-button {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--primary);
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.back-button:hover {
-  background: var(--primary-light);
-}
-
-/* GRID */
-
-.master-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-
-/* CARD */
-
-.master-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px;
-  box-sizing: border-box;
-
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.master-card h2 {
-  margin: 0 0 10px;
-  color: var(--text-primary);
-  font-size: 20px;
-}
-
-.master-card p {
-  margin: 0 0 20px;
-  color: var(--text-secondary);
-  font-size: 14px;
+/* Body tabel */
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
   line-height: 1.5;
 }
 
-/* JUMLAH */
-
-.master-number {
-  color: var(--primary);
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 20px;
+.data-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
-/* BUTTON */
-
-.master-button {
-  border: none;
-  background: var(--primary);
-  color: white;
-
-  padding: 10px 18px;
-  border-radius: 8px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
+.data-table tbody tr:hover {
+  background: var(--primary-light);
 }
 
-.master-button:hover {
-  background: var(--primary-dark);
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 768px) {
-
-  .master-page {
-    padding: 20px;
-  }
-
-  .master-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
-
-  .master-grid {
-    grid-template-columns: 1fr;
-  }
-
+/* State kosong / loading */
+.data-table td.data-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--text-hint);
+  font-size: 13px;
 }
 
 /* =====================================================
-   RESPONSIVE DATA TABLE
-   ===================================================== */
+   TOMBOL AKSI
+===================================================== */
 
-@media (max-width: 900px) {
+.data-action {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
 
+/* =====================================================
+   BADGE — dipakai untuk role, status, kategori
+===================================================== */
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.badge-green {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.badge-yellow {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+.badge-red {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+
+.badge-primary {
+  background: rgba(15, 109, 58, 0.1);
+  color: var(--primary);
+}
+
+/* Skor kelayakan — teks berwarna tanpa background */
+.skor-tinggi {
+  color: #15803d;
+  font-weight: 700;
+}
+.skor-sedang {
+  color: #b45309;
+  font-weight: 700;
+}
+.skor-rendah {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+body.dark .data-table-card {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .data-toolbar {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+body.dark .data-toolbar-title {
+  color: var(--text-primary);
+}
+
+body.dark .data-search {
+  background: var(--background);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+body.dark .data-search:focus {
+  background: var(--surface);
+  border-color: var(--primary);
+}
+
+body.dark .data-search::placeholder {
+  color: var(--text-hint);
+}
+
+body.dark .data-table thead tr {
+  background: rgba(8, 124, 81, 0.12);
+}
+
+body.dark .data-table th {
+  color: #6ee7b7;
+  border-color: var(--border);
+}
+
+body.dark .data-table td {
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+body.dark .data-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+body.dark .badge-green {
+  background: rgba(22, 163, 74, 0.18);
+  color: #4ade80;
+}
+
+body.dark .badge-yellow {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+}
+
+body.dark .badge-red {
+  background: rgba(220, 38, 38, 0.18);
+  color: #f87171;
+}
+
+body.dark .badge-primary {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+}
+
+body.dark .skor-tinggi {
+  color: #4ade80;
+}
+body.dark .skor-sedang {
+  color: #fbbf24;
+}
+body.dark .skor-rendah {
+  color: #f87171;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
   .data-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .data-toolbar-title {
+    flex: 1 0 100%;
+  }
+
+  .data-toolbar-right {
+    flex: 1 0 100%;
+    justify-content: space-between;
   }
 
   .data-search {
     width: 100%;
-    box-sizing: border-box;
+    flex: 1;
   }
 
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
 }
